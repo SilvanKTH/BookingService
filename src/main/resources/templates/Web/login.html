@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Login Page</title>
+</head>
+<body>
+	<form method="post" action="/my-bookings">
+		User name:
+  		<br>
+  		<input type="text" name="username" value="Enter your name">
+  		<br>
+  		<input type="submit" name="my-bookings" style="width:120px" value="See Bookings"> 		  		
+	</form>
+	<p th:text="'The current time unit is '+${timeUnit}"></p>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Check Availability</title>
+</head>
+<body>
+	<h2>Check Availability</h2>
+	<form method="post" action="/available-rooms">
+	  	Number of Rooms (max.10):<br>
+	  	<input type="text" name="rooms" value="choose between 1-10">
+	  	<br>
+	  	Arrival Date (# of time units from today):<br>
+	  	<input type="text" name="arrival" value="# of time units from today">
+	  	<br>
+	  	Departure Date (# of nights):<br>
+	  	<input type="text" name="departure" value="# of nights">
+	  	<br><br>
+	  	<input type="submit" style="width:120px" value="Submit">
+	</form> 
+	<form method="get" action="/bookingservice">
+		<input type="submit" style="width:120px" value="Return Home">
+	</form>
+	<p th:text="'The current time unit is '+${timeUnit}"></p>
+	
+</body>
+</html>

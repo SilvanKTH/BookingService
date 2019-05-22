@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<h2>TEST APP</h2>
+
+	<form method="get" action="/test">
+  		<input type="submit" name="Reload" style="width:120px" value="Reload">
+	</form> 	
+
+	<p>Used to display a test output message</p>
+	<p th:text="'Thanks for testing '+${nameInForm}+' '+${lastNameInForm}">This is the default message</p>
+
+</body>
+</html>

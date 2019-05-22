@@ -1,0 +1,42 @@
+%% SIMPLE MONITOR
+
+IMPORTS {
+    import com.example.demo.controllers.WebController;
+    import com.example.demo.domain.Booking;
+    import com.example.demo.larva.*;
+
+}%%IMPORTS
+
+GLOBAL {
+    
+    VARIABLES {
+        int total_bookings = 0;
+
+    }%%VARIABLES
+
+    EVENTS {
+        forwardHome() = { *.forwardHome() }
+        confirmBooking() = { *.setConfirm() }
+
+    }%%EVENTS
+
+    PROPERTY bookings {
+        
+        STATES {
+            ACCEPTING { }
+            BAD { bad {System.out.println("More than 5 bookings reached");} }
+            NORMAL { ok {System.out.println("Nothing happening");} }
+            STARTING { start {System.out.println("Forwarding home");} }
+
+        }%%STATES
+
+        TRANSITIONS {
+            start -> start [forwardHome() \ \]
+            start -> ok [confirmBooking() \ \ total_bookings++;]
+            ok -> ok [confirmBooking() \ \ total_bookings++;]
+            ok -> bad [confirmBooking() \ total_bookings > 5 \ total_bookings++;]
+            bad -> bad [confirmBooking() \ \ total_bookings++;]
+
+        }%%TRANSITIONS
+    }%%PROPERTY
+}%%GLOBAL

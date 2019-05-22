@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Hotel</title>
+</head>
+<body>
+
+	<h2 align="center">Booking Service</h2>
+	<br></br>
+	<br></br>
+	
+	<!--  
+	<div align="center">
+		<input type="button" onclick="alert('Hello World!')" style="width:120px" value="Choose Room">
+		<input type="button" onclick="alert('Hello World!')" style="width:120px" value="Check Availability">
+		<input type="button" onclick="alert('Hello World!')" style="width:120px" value="My Bookings">
+	</div>	
+	-->
+	
+	<!-- THIS LAYOUT SHOWS BUTTONS IN ONE SINGLE ROW -->
+	<!--  
+	<div align="center">
+		<form method="get" action="/simple">
+			<input type="submit" name="button" style="width:120px" value="Choose-Room">
+			
+			<form method="post" action="/simple">
+				<input type="submit" name="button" style="width:120px" value="Check-Dates">
+				
+				<form method="post" action="/simple">
+					<input type="submit" name="button" style="width:120px" value="My-Bookings">
+				</form>
+			</form>
+		</form>
+	</div>
+	-->
+	
+	<!-- THIS LAYOUT SHOWS BUTTONS IN ONE SINGLE COLUMN -->
+	
+	<div align="center">
+		<form method="get" action="/reservation">
+			<input type="submit" name="button" style="width:120px" value="Choose Room">
+		</form> 
+		
+		<form method="get" action="/check-availability">
+			<input type="submit" name="button" style="width:120px" value="Check Dates">
+		</form> 
+		
+		<form method="get" action="/login">
+			<input type="submit" name="button" style="width:120px" value="My Bookings">
+		</form> 	
+		<p th:text="'The current time unit is '+${timeUnit}"></p>
+	</div>	
+
+</body>
+</html>

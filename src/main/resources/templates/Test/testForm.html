@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<h2>TEST APP</h2>
+
+	<form method="post" action="/test">
+  		Name:
+  		<br>
+  		<input type="text" name="nameInForm" value="Enter your name">
+  		<br>
+  		Last Name:
+  		<br>
+  		<input type="text" name="lastNameInForm" value="Enter your last name">
+  		<br> 
+  		<input type="submit" name="sendForm" style="width:120px" value="OK"> 		
+	</form> 
+	
+	<form method="get" action="/simple">
+		<input type="submit" name="sendFurther" style="width:120px" value="FURTHER">
+	</form>
+	
+	<!--  
+	<p>Used to display a test output message</p>
+	<p th:text="'Thanks for testing '+${name}">This is the default message</p>
+	-->
+	
+</body>
+</html>
