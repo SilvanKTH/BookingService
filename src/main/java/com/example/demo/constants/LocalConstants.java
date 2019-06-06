@@ -31,4 +31,8 @@ public class LocalConstants {
 			+ "We are processing your reservation.\n"
 			+ "Please acknowledge that we charge a reservation fee of 20 %.\n"
 			+ "You may cancel your reservation until 1 time unit before your arrival.";
+	
+	// Regarding Monitoring File
+	public static String malUsersFile = "/Users/silvanzeller/Desktop/TCOMM/Master Thesis/BookingService/src/main/java/com/example/demo///mal_users.txt";
+	public static String trustedUsersFile = "/Users/silvanzeller/Desktop/TCOMM/Master Thesis/BookingService/src/main/java/com/example/demo///trusted_users.txt";
 }

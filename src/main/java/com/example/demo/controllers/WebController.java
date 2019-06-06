@@ -34,6 +34,8 @@ public class WebController {
 	CreditcardRepo creditcardRepo; // NOT REALLY NEEDED
 	@Autowired
 	ServiceRepo serviceRepo;
+	
+	public static Long controllerTimeReference = 0L;
 		
 	// Redirect to bookingservice URL
 	@RequestMapping(value="/", method=RequestMethod.GET)
@@ -80,8 +82,7 @@ public class WebController {
 			if (rooms > 0 && rooms <= 10 && arrival >= getCurrentDate() && departure >= arrival) {
 				Integer availableRooms = getAvailableRooms(rooms, arrival, departure);
 				if (availableRooms >= rooms) {
-					Booking booking = new Booking(name, rooms, arrival, departure, cancelLatest); // not yet confirmed, no check in database
-					System.out.println(booking.toString());
+					Booking booking = new Booking(name, rooms, arrival, departure, cancelLatest); 
 					bookingRepo.save(booking);
 					message = "The booking is being processed ... ";
 				} else {
@@ -181,6 +182,7 @@ public class WebController {
 			if (availableRooms >= userRooms) {
 				if (handleReservation(userRooms, userArrival, userDeparture)) {
 					latestBooking.setConfirm(true);
+					setConfirm(latestBooking);
 					bookingRepo.save(latestBooking);
 					message = "Thanks for your booking, "+username+"! Your booking ID is "+latestBooking.getId()+".";
 				} else {
@@ -204,11 +206,17 @@ public class WebController {
 		return "Web/confirmation";
 	}
 
+	public void setConfirm(Booking booking) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	// Handle cancellation input and display cancel confirmation page
 	@RequestMapping(value="/cancel-confirmation", method=RequestMethod.POST)
 	public String cancelConfirmation(HttpServletRequest request, Model model) throws NumberFormatException {
 		String name, message;
 		Long id;
+		Integer cancelDate;
 		try {
 			id = Long.valueOf(request.getParameter("id"));
 			Optional<Booking> booking = bookingRepo.findById(id);
@@ -216,9 +224,12 @@ public class WebController {
 			if (booking.isPresent()) {
 				Booking b = booking.get();
 				name = b.getName();
+				cancelDate = getCurrentDate();
+				b.setCancelDate(cancelDate);
 				if (handleCancellation(b)) {
 					if (!b.getCancel()) {
 						b.setCancel(true);
+						setCancel(b);
 						bookingRepo.save(b);
 						message = "We hope to seeing you again soon!";
 					} else {
@@ -248,10 +259,14 @@ public class WebController {
 		return "Web/cancel-confirmation";
 	}
 	
+	private void setCancel(Booking b) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	// Handle availability request data and return available rooms 
 	@RequestMapping(value="/available-rooms", method=RequestMethod.POST)
 	public String getAvailability(HttpServletRequest request, Model model) throws NumberFormatException{
-		System.out.println("IN getAvailability METHOD");
 		Integer rooms, arrival, departure;
 		Integer minAvailableRooms = 0;
 		String message;
@@ -329,17 +344,15 @@ public class WebController {
 		return availableRooms;
 	}
 	
-	private Integer getCurrentDate() {
+	public Integer getCurrentDate() {
 		Long timeReference = InitialConfiguration.timeReference;
 		Long timeSinceStartup = (System.currentTimeMillis() - timeReference);
 		Long normedTime = timeSinceStartup / LocalConstants.DAY_IN_MILLIS;		
-		System.out.println(normedTime);
 		
 		return normedTime.intValue() % Integer.MAX_VALUE;
 	}
 
 	private synchronized boolean handleReservation(Integer rooms, Integer arrival, Integer departure) {
-		System.out.println("IN handleReservation METHOD");
 		boolean success = true;
 		for (int i = arrival; i <= departure; i++) {
 			Optional<Service> o = serviceRepo.findByDay(Long.valueOf(i));
@@ -363,7 +376,6 @@ public class WebController {
 	}
 	
 	private void restoreServiceDB(Integer arrival, int lastItem, Integer rooms) {
-		System.out.println("Restoring the DB");
 		for (int j = arrival; j <= lastItem; j++) {
 			Optional<Service> o = serviceRepo.findByDay(Long.valueOf(j));
 			if (o.isPresent()) {

@@ -1,4 +1,7 @@
 %% SIMPLE MONITOR
+%% PATH: "/Users/silvanzeller/Desktop/TCOMM/Master Thesis/BookingService/simpleMonitor.lrv" -o "/Users/silvanzeller/Desktop/TCOMM/Master Thesis/BookingService/src/main/java/com/example/demo/" %%
+
+
 
 IMPORTS {
     import com.example.demo.controllers.WebController;

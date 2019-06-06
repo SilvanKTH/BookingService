@@ -1,0 +1,12 @@
+digraph _logic_bookings {
+rankdir=LR;
+node [shape = circle]; ok start;
+node [shape = octagon]; bad;
+node [shape = point]; _s_s;
+_s_s -> start;
+bad -> bad [ label = "(1) confirmBooking\\\\total_bookings ++ ; "];
+start -> start [ label = "(1) forwardHome"];
+start -> ok [ label = "(2) confirmBooking\\\\total_bookings ++ ; "];
+ok -> ok [ label = "(1) confirmBooking\\\\total_bookings ++ ; "];
+ok -> bad [ label = "(2) confirmBooking\\total_bookings > 5 \\total_bookings ++ ; "];
+}

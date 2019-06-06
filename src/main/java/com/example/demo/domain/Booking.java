@@ -30,6 +30,8 @@ public class Booking {
 	private Integer cancelLatest;
 	private Boolean confirm;
 	private Boolean cancel;
+	@Range(min=0)
+	private Integer cancelDate;
 	
 	public Booking() {}
 
@@ -43,6 +45,7 @@ public class Booking {
 		this.cancelLatest = cancelLatest;
 		this.confirm = false;
 		this.cancel = false;
+		this.cancelDate = null;
 	}
 
 	public Long getId() {
@@ -108,15 +111,20 @@ public class Booking {
 	public void setCancel(Boolean cancel) {
 		this.cancel = cancel;
 	}
+	
+	public Integer getCancelDate() {
+		return cancelDate;
+	}
+	
+	public void setCancelDate(Integer cancelDate) {
+		this.cancelDate = cancelDate;
+	}
 
 	@Override
 	public String toString() {
 		return "Booking [Id=" + Id + ", name=" + name + ", rooms=" + rooms + ", arrival=" + arrival + ", departure="
-				+ departure + ", confirm=" + confirm + ", cancel=" + cancel + "]";
+				+ departure + ", cancelLatest=" + cancelLatest + ", confirm=" + confirm + ", cancel=" + cancel
+				+ ", cancelDate=" + cancelDate + "]";
 	}
-
-	
-	
-	
 
 }

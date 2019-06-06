@@ -1,0 +1,14 @@
+digraph _logic_cancellations {
+rankdir=LR;
+node [shape = circle]; cancel start;
+node [shape = octagon]; ddos;
+node [shape = point]; _s_s;
+_s_s -> start;
+cancel -> cancel [ label = "(1) confirm_cancel\\\\cancellations ++ ; print_msg ( cancellations + \"  cancellations (cancel -> cancel \" ) ; "];
+cancel -> ddos [ label = "(2) confirm_cancel\\is_ddos == true \\cancellations ++ ; print_msg ( cancellations + \"  cancellations (cancel -> ddos) \" ) ; "];
+cancel -> start [ label = "(3) system_reset\\\\reset_all_lists ( ) ; print_msg ( \" resetting system from state cancel \" ) ; "];
+start -> cancel [ label = "(1) confirm_cancel\\\\cancellations ++ ; print_msg ( cancellations + \"  cancellations (start -> cancel) \" ) ; "];
+start -> start [ label = "(2) system_reset\\\\reset_all_lists ( ) ; print_msg ( \" resetting system from state start \" ) ; "];
+ddos -> ddos [ label = "(1) confirm_cancel\\\\cancellations ++ ; print_msg ( cancellations + \"  cancellations (ddos -> ddos) \" ) ; "];
+ddos -> start [ label = "(2) system_reset\\\\reset_all_lists ( ) ; is_ddos = false ; print_msg ( \" resetting system from state ddos \" ) ; "];
+}
