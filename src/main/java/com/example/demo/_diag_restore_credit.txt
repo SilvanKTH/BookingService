@@ -1,0 +1,7 @@
+digraph _logic_restore_credit {
+rankdir=LR;
+node [shape = circle]; start;
+node [shape = point]; _s_s;
+_s_s -> start;
+start -> start [ label = "(1) user_payment\\\\user_pay_list . add ( booking ) ; print_msg ( \" Restoring credit for user  \" + booking . getName ( ) ) ; "];
+}

@@ -5,7 +5,7 @@ import com.example.demo.constants.LocalConstants;
 import com.example.demo.controllers.WebController;
 import com.example.demo.domain.Booking;
 import com.example.demo.domain.User;
-import com.example.demo.domain.InitialConfiguration;
+import com.example.demo.configuration.InitialConfiguration;
 import com.example.demo.repository.UserRepo;
 import com.example.demo.repository.BookingRepo;
 import com.example.demo.larva.*;
@@ -22,6 +22,22 @@ after():(staticinitialization(*)){
 if (!initialized){
 	initialized = true;
 	_cls_ddos_monitor1.initialize();
+}
+}
+before ( Boolean b,Booking booking1) : (call(* Booking.setPayment(..)) && target(booking1) && args(b) && !cflow(adviceexecution()) && !cflow(within(larva.*))  && !(within(larva.*)) && if ((b ==true ))) {
+
+synchronized(_asp_ddos_monitor0.lock){
+Booking booking;
+String user;
+booking =booking1 ;
+user =booking1 .getName ();
+
+_cls_ddos_monitor1 _cls_inst = _cls_ddos_monitor1._get_cls_ddos_monitor1_inst( booking);
+_cls_inst.b = b;
+_cls_inst.booking1 = booking1;
+_cls_ddos_monitor1.user = user;
+_cls_inst._call(thisJoinPoint.getSignature().toString(), 8/*user_payment*/);
+_cls_inst._call_all_filtered(thisJoinPoint.getSignature().toString(), 8/*user_payment*/);
 }
 }
 before ( Boolean b,Booking booking1) : (call(* Booking.setCancel(..)) && target(booking1) && args(b) && !cflow(adviceexecution()) && !cflow(within(larva.*))  && !(within(larva.*)) && if ((b ==true ))) {

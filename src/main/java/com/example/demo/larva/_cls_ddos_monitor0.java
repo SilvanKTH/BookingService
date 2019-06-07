@@ -1,4 +1,4 @@
-package com.example.demo.larva;
+package com.example.demo.larva; 
 
 
 
@@ -6,7 +6,7 @@ import com.example.demo.constants.LocalConstants;
 import com.example.demo.controllers.WebController;
 import com.example.demo.domain.Booking;
 import com.example.demo.domain.User;
-import com.example.demo.domain.InitialConfiguration;
+import com.example.demo.configuration.InitialConfiguration;
 import com.example.demo.repository.UserRepo;
 import com.example.demo.repository.BookingRepo;
 import com.example.demo.larva.*;
@@ -22,6 +22,7 @@ public class _cls_ddos_monitor0 implements _callable{
 
 public static PrintWriter pw; 
 public static PrintWriter write_mal_cancel;
+public static PrintWriter write_user_pay;
 public static _cls_ddos_monitor0 root;
 
 public static LinkedHashMap<_cls_ddos_monitor0,_cls_ddos_monitor0> _cls_ddos_monitor0_instances = new LinkedHashMap<_cls_ddos_monitor0,_cls_ddos_monitor0>();
@@ -29,6 +30,8 @@ static{
 try{
 pw = new PrintWriter("/Users/silvanzeller/Desktop/TCOMM/Master Thesis/BookingService/src/main/java/com/example/demo///output_ddos_monitor.txt");
 write_mal_cancel = new PrintWriter ("/Users/silvanzeller/Desktop/TCOMM/Master Thesis/BookingService/src/main/java/com/example/demo///mal_users.txt");
+write_user_pay = new PrintWriter ("/Users/silvanzeller/Desktop/TCOMM/Master Thesis/BookingService/src/main/java/com/example/demo///benign_users.txt");
+
 root = new _cls_ddos_monitor0();
 _cls_ddos_monitor0_instances.put(root, root);
   root.initialisation();
@@ -47,6 +50,7 @@ int no_automata = 2;
  public boolean system_reset =false ;
  public List <Booking >cancellations_list =new ArrayList <Booking >();
  public List <Booking >mal_cancellations_list =new ArrayList <Booking >();
+ public List <Booking >user_pay_list =new ArrayList <Booking >();
 
 public static void initialize(){}
 //inheritance could not be used because of the automatic call to super()
@@ -249,9 +253,11 @@ System.out.println("LARVA LOG: >>"+msg);
 void reset_all_lists() {
 print_msg("in reset_all_lists()");
 late_cancellations = 0;
+
 if (cancellations_list.size() > 0) {
 cancellations_list.clear();
 }
+
 if (mal_cancellations_list.size() > 0) {
 print_msg("mal_cancellations size: "+mal_cancellations_list.size());
 for (Booking b : mal_cancellations_list) {
@@ -261,6 +267,16 @@ mal_cancellations_list.clear();
 }
 write_mal_cancel.println("\n---");
 write_mal_cancel.flush();
+
+if (user_pay_list.size() > 0) {
+print_msg("user_pay size: "+ user_pay_list.size());
+for (Booking b : user_pay_list) {
+write_user_pay.print(b.getName()+"#");
+}
+user_pay_list.clear();
+}
+write_user_pay.println("\n+++");
+write_user_pay.flush();
 }
 
 

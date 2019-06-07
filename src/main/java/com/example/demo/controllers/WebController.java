@@ -12,9 +12,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.example.demo.configuration.InitialConfiguration;
 import com.example.demo.constants.LocalConstants;
 import com.example.demo.domain.Booking;
-import com.example.demo.domain.InitialConfiguration;
 import com.example.demo.domain.Service;
 import com.example.demo.domain.User;
 import com.example.demo.repository.BookingRepo;
@@ -74,12 +74,18 @@ public class WebController {
 			List<User> users = userRepo.findByName(name);
 			if (users.isEmpty()) {
 				User u = new User(name, LocalConstants.CREDITCARD_PLACEHOLDER);
-				cancelLatest = arrival - getCancellationPeriod(u);
+				cancelLatest = arrival - getCancellationPeriod(u, arrival);
+				if (cancelLatest < getCurrentDate()) {
+					cancelLatest = getCurrentDate();
+				}
 			} else {
 				User u = users.get(0);
-				cancelLatest = arrival - getCancellationPeriod(u);
+				cancelLatest = arrival - getCancellationPeriod(u, arrival);
+				if (cancelLatest < getCurrentDate()) {
+					cancelLatest = getCurrentDate();
+				}
 			}
-			if (rooms > 0 && rooms <= 10 && arrival >= getCurrentDate() && departure >= arrival) {
+			if (rooms > 0 && rooms <= 4 && arrival >= getCurrentDate() && departure >= arrival) {
 				Integer availableRooms = getAvailableRooms(rooms, arrival, departure);
 				if (availableRooms >= rooms) {
 					Booking booking = new Booking(name, rooms, arrival, departure, cancelLatest); 
@@ -89,7 +95,7 @@ public class WebController {
 					message = "ERROR: Unfortunately, we are already fully booked during this period.";
 				}
 			} else {
-				message = "ERROR: You can only book between 1-10 rooms and enter valid dates.";
+				message = "ERROR: You can only book between 1-4 rooms and enter valid dates.";
 			}
 		} catch (NumberFormatException ex) {
 			message = "ERROR: You can only enter numbers in the fields!";
@@ -100,14 +106,20 @@ public class WebController {
 		
 		return "Web/contact";
 	}
-	
-	private Integer getCancellationPeriod(User u) {
+	// Determines service class 
+	// if TrustLevel == high | unknown --> cancel on short notice possible
+	// if TrustLevel == med --> longer cancellation period
+	// if TrustLevel == low --> prepaid, i.e. payment on the same day
+	private Integer getCancellationPeriod(User u, Integer arrival) {
 		Integer high = LocalConstants.TRUSTLEVEL_HIGH;
+		Integer med = LocalConstants.TRUSTLEVEL_MED;
 		Integer low = LocalConstants.TRUSTLEVEL_LOW;
 		if (u.getTrust() == high) {
 			return 1;
-		} else if (u.getTrust() == low) {
-			return 1;
+		} else if (u.getTrust() == med) {
+			return 5;
+		} else if (u.getTrust() == low){
+			return arrival - getCurrentDate();
 		} else {
 			return 1;
 		}
@@ -149,7 +161,7 @@ public class WebController {
 	public String setContactData(HttpServletRequest request, Model model) {
 		String name = request.getParameter("name");
 		String creditcard = request.getParameter("creditcard");
-		String username, rooms, arrival, departure, message;
+		String username, rooms, arrival, departure, cancelLatest, message;
 		List<Booking> bookingList = bookingRepo.findByName(name);
 			
 		int length = bookingList.size();
@@ -158,6 +170,7 @@ public class WebController {
 			rooms = "0";
 			arrival = "0";
 			departure = "0";
+			cancelLatest = "0";
 			message = "ERROR: No matching booking for user = "+name+" found in DB.";
 		} else {
 			Booking latestBooking = bookingList.get(length-1);
@@ -177,12 +190,12 @@ public class WebController {
 			Integer userRooms = latestBooking.getRooms();
 			Integer userArrival = latestBooking.getArrival();
 			Integer userDeparture = latestBooking.getDeparture();
+			Integer userCancelLatest = latestBooking.getCancelLatest();
 		
 			Integer availableRooms = getAvailableRooms(userRooms, userArrival, userDeparture);
 			if (availableRooms >= userRooms) {
 				if (handleReservation(userRooms, userArrival, userDeparture)) {
 					latestBooking.setConfirm(true);
-					setConfirm(latestBooking);
 					bookingRepo.save(latestBooking);
 					message = "Thanks for your booking, "+username+"! Your booking ID is "+latestBooking.getId()+".";
 				} else {
@@ -194,6 +207,7 @@ public class WebController {
 			rooms = String.valueOf(userRooms);
 			arrival = String.valueOf(userArrival);
 			departure = String.valueOf(userDeparture);
+			cancelLatest = String.valueOf(userCancelLatest);
 		}
 		Integer timeUnit = getCurrentDate();
 		model.addAttribute("timeUnit", timeUnit);			
@@ -201,14 +215,10 @@ public class WebController {
 		model.addAttribute("rooms", rooms);
 		model.addAttribute("arrival", arrival);
 		model.addAttribute("departure", departure);
+		model.addAttribute("cancelLatest", cancelLatest);
 		model.addAttribute("message", message);
 				
 		return "Web/confirmation";
-	}
-
-	public void setConfirm(Booking booking) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	// Handle cancellation input and display cancel confirmation page
@@ -229,7 +239,7 @@ public class WebController {
 				if (handleCancellation(b)) {
 					if (!b.getCancel()) {
 						b.setCancel(true);
-						setCancel(b);
+						returnRooms(b);
 						bookingRepo.save(b);
 						message = "We hope to seeing you again soon!";
 					} else {
@@ -259,9 +269,18 @@ public class WebController {
 		return "Web/cancel-confirmation";
 	}
 	
-	private void setCancel(Booking b) {
-		// TODO Auto-generated method stub
-		
+	private void returnRooms(Booking b) {
+		Integer rooms = b.getRooms();
+		Integer arrival = b.getArrival();
+		Integer departure = b.getDeparture();
+		for (int i = arrival; i <= departure; i++) {
+			Optional<Service> o = serviceRepo.findByDay(Long.valueOf(i));
+			if (o.isPresent()) {
+				Service s = o.get();
+				Integer items = s.getRooms() + rooms;
+				s.setRooms(items);
+			}			
+		}
 	}
 
 	// Handle availability request data and return available rooms 
@@ -274,7 +293,7 @@ public class WebController {
 			rooms = Integer.parseInt(request.getParameter("rooms"));		
 			arrival = Integer.parseInt(request.getParameter("arrival"));
 			departure = Integer.parseInt(request.getParameter("departure"));
-			if (rooms > 0 && rooms <= 10 && arrival >= 0 && departure >= arrival) {
+			if (rooms > 0 && rooms <= 4 && arrival >= 0 && departure >= arrival) {
 				minAvailableRooms = getAvailableRooms(rooms, arrival, departure);	
 				arrival = getCurrentDate() + arrival;
 				departure = arrival + departure;
@@ -283,7 +302,7 @@ public class WebController {
 				rooms = 0;
 				arrival = 0;
 				departure = 0;
-				message = "ERROR: You can only book between 1-10 rooms and enter valid dates";
+				message = "ERROR: You can only book between 1-4 rooms and enter valid dates";
 			}								
 		} catch (NumberFormatException ex) {
 			rooms = 0;
@@ -340,7 +359,6 @@ public class WebController {
 				availableRooms = 0;
 			}
 		}
-		
 		return availableRooms;
 	}
 	
@@ -370,8 +388,7 @@ public class WebController {
 				success = false; 
 				break;
 			}
-		}
-		
+		}		
 		return success;
 	}
 	

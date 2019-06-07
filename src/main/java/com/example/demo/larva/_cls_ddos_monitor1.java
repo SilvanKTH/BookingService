@@ -1,4 +1,4 @@
-package com.example.demo.larva;
+package com.example.demo.larva; 
 
 
 
@@ -6,7 +6,7 @@ import com.example.demo.constants.LocalConstants;
 import com.example.demo.controllers.WebController;
 import com.example.demo.domain.Booking;
 import com.example.demo.domain.User;
-import com.example.demo.domain.InitialConfiguration;
+import com.example.demo.configuration.InitialConfiguration;
 import com.example.demo.repository.UserRepo;
 import com.example.demo.repository.BookingRepo;
 import com.example.demo.larva.*;
@@ -26,9 +26,10 @@ _cls_ddos_monitor0 parent;
 public static Boolean b;
 public static Integer cancel_latest;
 public static Integer cancel_date;
+public static String user;
 public static Booking booking1;
 public Booking booking;
-int no_automata = 1;
+int no_automata = 2;
  public final int CRITICAL_PERIOD =2 ;
  public final int CRITICAL_NO_ATTACKERS =2 ;
 
@@ -76,6 +77,7 @@ return (booking==null?1:booking.hashCode()) *(parent==null?1:parent.hashCode()) 
 public void _call(String _info, int... _event){
 synchronized(_cls_ddos_monitor1_instances){
 _performLogic_late_cancellations(_info, _event);
+_performLogic_restore_credit(_info, _event);
 }
 }
 
@@ -112,7 +114,7 @@ else if (_state_id_late_cancellations==6){
 		if (1==0){}
 		else if ((_occurredEvent(_event,6/*late_cancellation*/)) && (((cancel_latest -cancel_date )<=CRITICAL_PERIOD )&&((cancel_latest -cancel_date )>=0 )&&(parent.late_cancellations <CRITICAL_NO_ATTACKERS ))){
 		parent.late_cancellations ++;
-print_msg (parent.late_cancellations +" parent.late_cancellations");
+print_msg (parent.late_cancellations +" late_cancellations");
 parent.cancellations_list .add (booking );
 
 		_state_id_late_cancellations = 6;//moving to state start
@@ -139,7 +141,7 @@ else if (_state_id_late_cancellations==5){
 		if (1==0){}
 		else if ((_occurredEvent(_event,6/*late_cancellation*/)) && (((cancel_latest -cancel_date )<=CRITICAL_PERIOD )&&((cancel_latest -cancel_date )>=0 ))){
 		parent.late_cancellations ++;
-print_msg (parent.late_cancellations +"parent.late_cancellations");
+print_msg (parent.late_cancellations +" late_cancellations");
 parent.mal_cancellations_list .add (booking );
 
 		_state_id_late_cancellations = 5;//moving to state ddos
@@ -169,6 +171,37 @@ case 5: if (_mode == 0) return "ddos"; else return "!!!SYSTEM REACHED BAD STATE!
 default: return "!!!SYSTEM REACHED AN UNKNOWN STATE!!!";
 }
 }
+int _state_id_restore_credit = 7;
+
+public void _performLogic_restore_credit(String _info, int... _event) {
+
+if (0==1){}
+else if (_state_id_restore_credit==7){
+		if (1==0){}
+		else if ((_occurredEvent(_event,8/*user_payment*/))){
+		parent.user_pay_list .add (booking );
+print_msg ("Restoring credit for user "+booking .getName ());
+
+		_state_id_restore_credit = 7;//moving to state start
+		_goto_restore_credit(_info);
+		}
+}
+}
+
+public void _goto_restore_credit(String _info){
+ String state_format = _string_restore_credit(_state_id_restore_credit, 1);
+ if (state_format.startsWith("!!!SYSTEM REACHED BAD STATE!!!")) {
+_cls_ddos_monitor0.pw.println("[restore_credit]MOVED ON METHODCALL: "+ _info +" TO STATE::> " + state_format);
+_cls_ddos_monitor0.pw.flush();
+}
+}
+
+public String _string_restore_credit(int _state_id, int _mode){
+switch(_state_id){
+case 7: if (_mode == 0) return "start"; else return "start";
+default: return "!!!SYSTEM REACHED AN UNKNOWN STATE!!!";
+}
+}
 
 public boolean _occurredEvent(int[] _events, int event){
 for (int i:_events) if (i == event) return true;
@@ -183,10 +216,12 @@ System.out.println("LARVA LOG: >>"+msg);
 void reset_all_lists() {
 print_msg("in reset_all_lists()");
 late_cancellations = 0;
+
 if (cancellations_list.size() > 0) {
 cancellations_list.clear();
 }
-if (mal_cancellations_list.size > 0) {
+
+if (mal_cancellations_list.size() > 0) {
 print_msg("mal_cancellations size: "+mal_cancellations_list.size());
 for (Booking b : mal_cancellations_list) {
 write_mal_cancel.print(b.getName()+"#");
@@ -195,6 +230,16 @@ mal_cancellations_list.clear();
 }
 write_mal_cancel.println("\n---");
 write_mal_cancel.flush();
+
+if (user_pay_list.size() > 0) {
+print_msg("user_pay size: "+ user_pay_list.size());
+for (Booking b : user_pay_list) {
+write_user_pay.print(b.getName()+"#");
+}
+user_pay_list.clear();
+}
+write_user_pay.println("\n+++");
+write_user_pay.flush();
 }
 */
 

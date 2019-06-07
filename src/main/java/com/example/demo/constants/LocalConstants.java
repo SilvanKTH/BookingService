@@ -8,7 +8,8 @@ public class LocalConstants {
 	
 	// Regarding the user trust level 
 	public static final Integer TRUSTLEVEL_HIGH = 2;
-	public static Integer TRUSTLEVEL_LOW = 0;
+	public static final Integer TRUSTLEVEL_MED = 1;
+	public static final Integer TRUSTLEVEL_LOW = 0;
 	
 	// Regarding the available items
 	public static Integer NUMBER_ROOMS = 200; 
@@ -34,5 +35,5 @@ public class LocalConstants {
 	
 	// Regarding Monitoring File
 	public static String malUsersFile = "/Users/silvanzeller/Desktop/TCOMM/Master Thesis/BookingService/src/main/java/com/example/demo///mal_users.txt";
-	public static String trustedUsersFile = "/Users/silvanzeller/Desktop/TCOMM/Master Thesis/BookingService/src/main/java/com/example/demo///trusted_users.txt";
+	public static String benignUsersFile = "/Users/silvanzeller/Desktop/TCOMM/Master Thesis/BookingService/src/main/java/com/example/demo///benign_users.txt";
 }

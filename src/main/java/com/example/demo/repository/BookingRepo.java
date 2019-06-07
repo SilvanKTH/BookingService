@@ -8,5 +8,6 @@ import com.example.demo.domain.Booking;
 public interface BookingRepo extends JpaRepository<Booking, Long>{
 
 	List<Booking> findByName(String name);
+	List<Booking> findByCancelLatest(Integer date);
 
 }

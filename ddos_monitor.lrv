@@ -10,7 +10,7 @@ IMPORTS {
  import com.example.demo.controllers.WebController;
  import com.example.demo.domain.Booking;
  import com.example.demo.domain.User;
- import com.example.demo.domain.InitialConfiguration;
+ import com.example.demo.configuration.InitialConfiguration;
  import com.example.demo.repository.UserRepo; 
  import com.example.demo.repository.BookingRepo; 
  import com.example.demo.larva.*;
@@ -33,9 +33,11 @@ GLOBAL {
 
   List<Booking> cancellations_list = new ArrayList<Booking>();
   List<Booking> mal_cancellations_list = new ArrayList<Booking>();
+  List<Booking> user_pay_list = new ArrayList<Booking>();
 
 %% PrintWriter must be instantiated manually
   PrintWriter write_mal_cancel = new PrintWriter("/Users/silvanzeller/Desktop/TCOMM/Master Thesis/BookingService/src/main/java/com/example/demo///mal_users.txt");
+  PrintWriter write_user_pay = new PrintWriter("/Users/silvanzeller/Desktop/TCOMM/Master Thesis/BookingService/src/main/java/com/example/demo///benign_users.txt");
 
  }%%VARIABLES
 
@@ -123,6 +125,10 @@ GLOBAL {
    filter { (b == true) }
    where { booking = booking1; cancel_latest = booking1.getCancelLatest(); cancel_date = booking1.getCancelDate(); }
 
+   user_payment(Boolean b, String user) = { Booking booking1.setPayment(b) }
+   filter { (b == true) }
+   where { booking = booking1; user = booking1.getName(); }
+
   }%%EVENTS
 
   PROPERTY late_cancellations {
@@ -153,6 +159,22 @@ GLOBAL {
 
   }%%PROPERTY late_cancellations
 
+  PROPERTY restore_credit {
+     
+   STATES {
+    
+    STARTING { start }
+ 
+   }%%STATES
+
+   TRANSITIONS {
+
+    start -> start [user_payment() \ \ user_pay_list.add(booking); print_msg("Restoring credit for user "+booking.getName());]
+
+   }%%TRANSITIONS
+
+  }%% restore_credit
+
  }%%FOREACH (Booking b)
 
 }%%GLOBAL
@@ -167,9 +189,11 @@ METHODS {
  void reset_all_lists() {
   print_msg("in reset_all_lists()");
   late_cancellations = 0;
+
   if (cancellations_list.size() > 0) { 
    cancellations_list.clear();
   }
+
   if (mal_cancellations_list.size() > 0) {
    print_msg("mal_cancellations size: "+mal_cancellations_list.size());
    for (Booking b : mal_cancellations_list) {
@@ -179,9 +203,19 @@ METHODS {
   }
   write_mal_cancel.println("\n---"); 
   write_mal_cancel.flush();
+ 
+  if (user_pay_list.size() > 0) {
+   print_msg("user_pay size: "+ user_pay_list.size());
+   for (Booking b : user_pay_list) {
+    write_user_pay.print(b.getName()+"#");
+   }
+   user_pay_list.clear();
+  }
+  write_user_pay.println("\n+++");
+  write_user_pay.flush();
  }
 
-%% only needed on booking level, add parent manually
+%% only needed on booking level, add 'parent' manually
  void merge_lists() {
   print_msg("in merge_lists()");
   for (Booking b : cancellations_list) {

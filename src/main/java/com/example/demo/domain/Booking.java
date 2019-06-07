@@ -20,7 +20,7 @@ public class Booking {
 	//private User user; 
 	@NotNull
 	private String name;
-	@Range(min=0, max=10)
+	@Range(min=0, max=4)
 	private Integer rooms;
 	@Range(min=0)
 	private Integer arrival;
@@ -30,12 +30,13 @@ public class Booking {
 	private Integer cancelLatest;
 	private Boolean confirm;
 	private Boolean cancel;
+	private Boolean payment;
 	@Range(min=0)
 	private Integer cancelDate;
 	
 	public Booking() {}
 
-	public Booking(@NotNull String name, @Range(min = 0, max = 10) Integer rooms, @Range(min = 0) Integer arrival,
+	public Booking(@NotNull String name, @Range(min = 0, max = 4) Integer rooms, @Range(min = 0) Integer arrival,
 			@Range(min = 0) Integer departure, @Range(min = 0) Integer cancelLatest) {
 		super();
 		this.name = name.trim();
@@ -45,6 +46,7 @@ public class Booking {
 		this.cancelLatest = cancelLatest;
 		this.confirm = false;
 		this.cancel = false;
+		this.payment = false;
 		this.cancelDate = null;
 	}
 
@@ -120,11 +122,21 @@ public class Booking {
 		this.cancelDate = cancelDate;
 	}
 
+	public Boolean getPayment() {
+		return payment;
+	}
+
+	public void setPayment(Boolean payment) {
+		this.payment = payment;
+	}
+
 	@Override
 	public String toString() {
 		return "Booking [Id=" + Id + ", name=" + name + ", rooms=" + rooms + ", arrival=" + arrival + ", departure="
 				+ departure + ", cancelLatest=" + cancelLatest + ", confirm=" + confirm + ", cancel=" + cancel
-				+ ", cancelDate=" + cancelDate + "]";
+				+ ", payment=" + payment + ", cancelDate=" + cancelDate + "]";
 	}
+
+	
 
 }
