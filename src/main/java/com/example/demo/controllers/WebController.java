@@ -197,7 +197,7 @@ public class WebController {
 				if (handleReservation(userRooms, userArrival, userDeparture)) {
 					latestBooking.setConfirm(true);
 					bookingRepo.save(latestBooking);
-					message = "Thanks for your booking, "+username+"! Your booking ID is "+latestBooking.getId()+".";
+					message = "Thanks for your booking, "+username+"! Your booking ID is "+latestBooking.getId()+" .";
 				} else {
 					message = "ERROR: Writing to DB was not successful.";
 				}
@@ -279,6 +279,7 @@ public class WebController {
 				Service s = o.get();
 				Integer items = s.getRooms() + rooms;
 				s.setRooms(items);
+				//s.setTotalBookedRooms(items);
 			}			
 		}
 	}
@@ -292,11 +293,11 @@ public class WebController {
 		try {
 			rooms = Integer.parseInt(request.getParameter("rooms"));		
 			arrival = Integer.parseInt(request.getParameter("arrival"));
-			departure = Integer.parseInt(request.getParameter("departure"));
+			departure = Integer.parseInt(request.getParameter("departure")) + arrival;
 			if (rooms > 0 && rooms <= 4 && arrival >= 0 && departure >= arrival) {
 				minAvailableRooms = getAvailableRooms(rooms, arrival, departure);	
-				arrival = getCurrentDate() + arrival;
-				departure = arrival + departure;
+				arrival = getCurrentDate() + arrival; //this is for making the scripting easier
+				departure = getCurrentDate() + departure;
 				message = "Thanks for your request!";
 			} else {
 				rooms = 0;
@@ -325,23 +326,23 @@ public class WebController {
 		List<Service> allDates = serviceRepo.findAll();
 		Integer latestDateInCalendar = allDates.size() - 1; 
 		if (arrival > latestDateInCalendar) {
-			System.out.println("ARRIVAL AFTER LAST DAY IN CALENDAR");
+			//System.out.println("ARRIVAL AFTER LAST DAY IN CALENDAR");
 			for (int i = latestDateInCalendar + 1; i < arrival; i++) {
 				Long day = Long.valueOf(i);
-				Service s = new Service(day, LocalConstants.NUMBER_ROOMS);
+				Service s = new Service(day, LocalConstants.NUMBER_ROOMS, LocalConstants.NUMBER_ROOMS);
 				serviceRepo.save(s);
-				System.out.println("Before arrival, saving "+s.toString());
+				//System.out.println("Before arrival, saving "+s.toString());
 			}
 		}
 		
 		if (departure > latestDateInCalendar) {
-			System.out.println("DEPARTURE AFTER LAST DAY IN CALENDAR");
+			//System.out.println("DEPARTURE AFTER LAST DAY IN CALENDAR");
 			for (int i = arrival; i <= departure; i++) {
 				if (i > latestDateInCalendar) {
 					Long day = Long.valueOf(i);
-					Service s = new Service(day, LocalConstants.NUMBER_ROOMS);
+					Service s = new Service(day, LocalConstants.NUMBER_ROOMS, LocalConstants.NUMBER_ROOMS);
 					serviceRepo.save(s);
-					System.out.println("Between arrival and departure, saving "+s.toString());
+					//System.out.println("Between arrival and departure, saving "+s.toString());
 				}
 			}
 		}
@@ -383,6 +384,7 @@ public class WebController {
 					break; 
 				}
 				s.setRooms(items);
+				s.setTotalBookedRooms(items);
 				serviceRepo.save(s);
 			} else {
 				success = false; 
@@ -399,6 +401,7 @@ public class WebController {
 				Service s = o.get();
 				Integer items = s.getRooms() + rooms;
 				s.setRooms(items);
+				s.setTotalBookedRooms(items);
 				serviceRepo.save(s);
 			} else {
 				break;

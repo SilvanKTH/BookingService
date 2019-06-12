@@ -114,7 +114,7 @@ else if (_state_id_late_cancellations==6){
 		if (1==0){}
 		else if ((_occurredEvent(_event,6/*late_cancellation*/)) && (((cancel_latest -cancel_date )<=CRITICAL_PERIOD )&&((cancel_latest -cancel_date )>=0 )&&(parent.late_cancellations <CRITICAL_NO_ATTACKERS ))){
 		parent.late_cancellations ++;
-print_msg (parent.late_cancellations +" late_cancellations");
+/*print_msg (parent.late_cancellations +" late_cancellations");*/
 parent.cancellations_list .add (booking );
 
 		_state_id_late_cancellations = 6;//moving to state start
@@ -131,7 +131,7 @@ parent.mal_cancellations_list .add (booking );
 		_goto_late_cancellations(_info);
 		}
 		else if ((_occurredEvent(_event,4/*system_reset*/))){
-		print_msg ("resetting system from state start (Booking)"+booking .toString ());
+		/*print_msg ("resetting system from state start (Booking)"+booking .toString ());*/
 
 		_state_id_late_cancellations = 6;//moving to state start
 		_goto_late_cancellations(_info);
@@ -141,7 +141,7 @@ else if (_state_id_late_cancellations==5){
 		if (1==0){}
 		else if ((_occurredEvent(_event,6/*late_cancellation*/)) && (((cancel_latest -cancel_date )<=CRITICAL_PERIOD )&&((cancel_latest -cancel_date )>=0 ))){
 		parent.late_cancellations ++;
-print_msg (parent.late_cancellations +" late_cancellations");
+/*print_msg (parent.late_cancellations +" late_cancellations");*/
 parent.mal_cancellations_list .add (booking );
 
 		_state_id_late_cancellations = 5;//moving to state ddos
@@ -180,7 +180,7 @@ else if (_state_id_restore_credit==7){
 		if (1==0){}
 		else if ((_occurredEvent(_event,8/*user_payment*/))){
 		parent.user_pay_list .add (booking );
-print_msg ("Restoring credit for user "+booking .getName ());
+/*print_msg ("Restoring credit for user "+booking .getName ());*/
 
 		_state_id_restore_credit = 7;//moving to state start
 		_goto_restore_credit(_info);
@@ -244,7 +244,7 @@ write_user_pay.flush();
 */
 
 void merge_lists() {
-print_msg("in merge_lists()");
+/*print_msg("in merge_lists()");*/
 for (Booking b : parent.cancellations_list) {
 System.out.println(b.toString());
 parent.mal_cancellations_list.add(b);

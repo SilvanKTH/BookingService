@@ -9,7 +9,7 @@
 	<p th:text="'Thanks for your booking, '+${username}+'!'"></p>
 	<p th:text="'We are looking forward to your stay from '+${arrival}+' to '+${departure}+'.'"></p>
 	<p th:text="'You have booked '+${rooms}+' rooms! Feel free to check all your bookings under My Bookings!'"></p>
-	<p th:text="'You may cancel the booking until '+${cancelLatest}+'.'"></p>
+	<p th:text="'You may cancel the booking until '+${cancelLatest}+' .'"></p>
 	<p th:text="${message}"></p>
 	<form method="get" action="/bookingservice">
 		<input type="submit" style="width:120px" value="Return Home">
@@ -17,6 +17,6 @@
 	<form method="get" action="/login">
 		<input type="submit" style="width:120px" value="My Bookings">
 	</form>
-	<p th:text="'The current time unit is '+${timeUnit}"></p>
+	<p th:text="'The current time unit is '+${timeUnit}+' '"></p>
 </body>
 </html>

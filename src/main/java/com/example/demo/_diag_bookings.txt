@@ -4,6 +4,6 @@ node [shape = circle]; start;
 node [shape = octagon]; undefined;
 node [shape = point]; _s_s;
 _s_s -> start;
-start -> start [ label = "(1) confirm_booking\\\\bookings ++ ; print_msg ( bookings + \"  bookings \" ) ; "];
-start -> undefined [ label = "(2) confirm_booking\\bookings < cancellations \\print_msg ( \" undefined state - less bookings than cancellations \" ) ; bookings ++ ; "];
+start -> start [ label = "(1) confirm_booking\\\\bookings ++ ; "];
+start -> undefined [ label = "(2) confirm_booking\\bookings < cancellations \\ bookings ++ ; "];
 }

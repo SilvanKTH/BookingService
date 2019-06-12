@@ -15,21 +15,25 @@ public class Service {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
+	
 	@NotNull
 	private Long day;
-	@Positive
-	private Integer rooms;
+	
+	//@Positive
+	private Integer availableRooms;
+	
+	// for performance measures
+	private Integer totalAvailableRooms;
 	
 	public Service() {}
 	
 	
 	
-	public Service(@Positive Long day, @Positive Integer rooms) {
+	public Service(@Positive Long day, @Positive Integer availableRooms, Integer totalAvailableRooms) {
 		this.day = day;
-		this.rooms = rooms;
+		this.availableRooms = availableRooms;
+		this.totalAvailableRooms = totalAvailableRooms;
 	}
-
-
 
 	public Long getId() {
 		return id;
@@ -48,20 +52,26 @@ public class Service {
 	}
 
 	public Integer getRooms() {
-		return rooms;
+		return availableRooms;
 	}
 
 	public void setRooms(Integer rooms) {
-		this.rooms = rooms;
+		this.availableRooms = rooms;
 	}
 
+	public Integer getTotalBookedRooms() {
+		return totalAvailableRooms;
+	}
 
+	public void setTotalBookedRooms(Integer totalBookedRooms) {
+		this.totalAvailableRooms = totalBookedRooms;
+	}
 
 	@Override
 	public String toString() {
-		return "Service [id=" + id + ", day=" + day + ", rooms=" + rooms + "]";
-	}	
-	
-	
+		return "Service [id=" + id + ", day=" + day + ", rooms=" + availableRooms + ", totalBookedRooms=" + totalAvailableRooms
+				+ "]";
+	}
+
 	
 }

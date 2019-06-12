@@ -21,16 +21,13 @@ public class User {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
-	//@NotNull(message="Last Name cannot be empty")
-	//private String firstName;
-	//@NotNull(message="Last Name cannot be empty")
-	//private String lastName;
+
 	@NotNull
 	private String name;
-	@Positive
+
+	//@Positive
 	private Integer trust;
-	//@ManyToOne
-	//private Booking booking;
+
 	@NotNull
 	private String creditcard;
 	

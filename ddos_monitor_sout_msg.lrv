@@ -1,0 +1,232 @@
+%%LARVA SCRIPT%%
+%%DDOS MONITOR v3%%
+%%PATH: "/Users/silvanzeller/Desktop/TCOMM/Master Thesis/BookingService/ddos_monitor.lrv" -o "/Users/silvanzeller/Desktop/TCOMM/Master Thesis/BookingService/src/main/java/com/example/demo/"%%
+
+
+IMPORTS {
+ package com.example.demo.aspects;
+ 
+ import com.example.demo.constants.LocalConstants;   
+ import com.example.demo.controllers.WebController;
+ import com.example.demo.domain.Booking;
+ import com.example.demo.domain.User;
+ import com.example.demo.configuration.InitialConfiguration;
+ import com.example.demo.repository.UserRepo; 
+ import com.example.demo.repository.BookingRepo; 
+ import com.example.demo.larva.*;
+ import java.time.*;
+ import java.util.List;
+ import java.util.ArrayList;
+
+}%%IMPORTS
+
+GLOBAL {
+
+ VARIABLES {
+
+  int current_time = 0;
+  int bookings = 0;
+  int cancellations = 0;
+  int late_cancellations = 0;
+  boolean is_ddos = false;
+  boolean system_reset = false;
+
+  List<Booking> cancellations_list = new ArrayList<Booking>();
+  List<Booking> mal_cancellations_list = new ArrayList<Booking>();
+  List<Booking> user_pay_list = new ArrayList<Booking>();
+
+%% PrintWriter must be instantiated manually
+  PrintWriter write_mal_cancel = new PrintWriter("/Users/silvanzeller/Desktop/TCOMM/Master Thesis/BookingService/src/main/java/com/example/demo///mal_users.txt");
+  PrintWriter write_user_pay = new PrintWriter("/Users/silvanzeller/Desktop/TCOMM/Master Thesis/BookingService/src/main/java/com/example/demo///benign_users.txt");
+
+ }%%VARIABLES
+
+ EVENTS {
+
+  confirm_cancel(Boolean b) = { *.Booking.setCancel(b) }
+  filter { (b == true) } 
+  confirm_booking(Boolean b) = { *.Booking.setConfirm(b) }
+  filter { (b == true) }
+  system_reset() = { *.updateDateAOP(*) }
+
+ }%%EVENTS
+
+ PROPERTY cancellations {
+
+  STATES {
+
+   BAD { ddos }
+   NORMAL { cancel }
+   STARTING { start }
+
+  }%%STATES
+
+  TRANSITIONS {
+   
+   start -> cancel 
+[confirm_cancel() \ \ cancellations++; print_msg(cancellations+" cancellations (start -> cancel)");]
+   
+   cancel -> cancel 
+[confirm_cancel() \ \ cancellations++; print_msg(cancellations+" cancellations (cancel -> cancel)");]
+
+   cancel -> ddos 
+[confirm_cancel() \ is_ddos == true \ cancellations++; print_msg(cancellations+" cancellations (cancel -> ddos)");]
+
+   ddos -> ddos 
+[confirm_cancel() \ \ cancellations++; print_msg(cancellations+" cancellations (ddos -> ddos)");]
+
+   cancel -> start 
+[system_reset() \ \ reset_all_lists(); print_msg("resetting system from state cancel");]
+
+   ddos -> start 
+[system_reset() \ \ reset_all_lists(); is_ddos = false; print_msg("resetting system from state ddos");]
+
+   start -> start 
+[system_reset() \ \ reset_all_lists(); print_msg("resetting system from state start");]
+
+  }%%TRANSITIONS
+
+ }%%PROPERTY cancellations
+
+ PROPERTY bookings {
+
+  STATES {
+
+   BAD { undefined }
+   STARTING { start }
+
+  }%%STATES
+
+  TRANSITIONS {
+   
+   start -> start 
+[confirm_booking()\ \ bookings++; print_msg(bookings+" bookings");]
+
+   start -> undefined 
+[confirm_booking()\ bookings < cancellations \ print_msg("undefined state - less bookings than cancellations"); bookings++;]
+
+  }%%TRANSITIONS
+
+ }%%PROPERTY bookings
+
+ FOREACH (Booking booking) {
+
+  VARIABLES {
+
+%%Variables do not get parsed correctly
+   final int CRITICAL_PERIOD = 2; 
+   final int CRITICAL_NO_ATTACKERS = 2;
+
+  }%%VARIABLES
+
+  EVENTS {
+
+   late_cancellation(Boolean b, Integer cancel_latest, Integer cancel_date) = { Booking booking1.setCancel(b) }
+   filter { (b == true) }
+   where { booking = booking1; cancel_latest = booking1.getCancelLatest(); cancel_date = booking1.getCancelDate(); }
+
+   user_payment(Boolean b, String user) = { Booking booking1.setPayment(b) }
+   filter { (b == true) }
+   where { booking = booking1; user = booking1.getName(); }
+
+  }%%EVENTS
+
+  PROPERTY late_cancellations {
+
+   STATES {
+
+    BAD { ddos }
+    STARTING { start }
+
+   }%%STATES
+
+   TRANSITIONS {
+
+    start -> start 
+[late_cancellation()\ ((cancel_latest - cancel_date) <= CRITICAL_PERIOD) && ((cancel_latest - cancel_date) >= 0) && (late_cancellations < CRITICAL_NO_ATTACKERS) \ late_cancellations++; print_msg(late_cancellations+" late_cancellations"); cancellations_list.add(booking);]
+    
+    start -> ddos 
+[late_cancellation()\ ((cancel_latest - cancel_date) <= CRITICAL_PERIOD) && ((cancel_latest - cancel_date) >= 0) \ is_ddos = true; late_cancellations++; print_msg(late_cancellations+" late_cancellations - critical state reached!"); merge_lists(); mal_cancellations_list.add(booking);]
+
+    ddos -> ddos 
+[late_cancellation()\ ((cancel_latest - cancel_date) <= CRITICAL_PERIOD) && ((cancel_latest - cancel_date) >= 0) \ late_cancellations++; print_msg(late_cancellations+" late_cancellations"); mal_cancellations_list.add(booking);]
+
+    start -> start [system_reset() \ \ print_msg("resetting system from state start (Booking)"+booking.toString());]
+
+    ddos -> start [system_reset() \ \ print_msg("resetting system from state ddos (Booking)");] 
+
+   }%%TRANSITIONS
+
+  }%%PROPERTY late_cancellations
+
+  PROPERTY restore_credit {
+     
+   STATES {
+    
+    STARTING { start }
+ 
+   }%%STATES
+
+   TRANSITIONS {
+
+    start -> start [user_payment() \ \ user_pay_list.add(booking); print_msg("Restoring credit for user "+booking.getName());]
+
+   }%%TRANSITIONS
+
+  }%% restore_credit
+
+ }%%FOREACH (Booking b)
+
+}%%GLOBAL
+
+METHODS {
+
+ void print_msg(String msg) {
+  System.out.println("LARVA LOG: >>"+msg);
+ }
+
+%% only needed on system level
+ void reset_all_lists() {
+  print_msg("in reset_all_lists()");
+  late_cancellations = 0;
+
+  if (cancellations_list.size() > 0) { 
+   cancellations_list.clear();
+  }
+
+  if (mal_cancellations_list.size() > 0) {
+   print_msg("mal_cancellations size: "+mal_cancellations_list.size());
+   for (Booking b : mal_cancellations_list) {
+    write_mal_cancel.print(b.getName()+"#");
+   }
+   mal_cancellations_list.clear(); 
+  }
+  write_mal_cancel.println("\n---"); 
+  write_mal_cancel.flush();
+ 
+  if (user_pay_list.size() > 0) {
+   print_msg("user_pay size: "+ user_pay_list.size());
+   for (Booking b : user_pay_list) {
+    write_user_pay.print(b.getName()+"#");
+   }
+   user_pay_list.clear();
+  }
+  write_user_pay.println("\n+++");
+  write_user_pay.flush();
+ }
+
+%% only needed on booking level, add 'parent' manually
+ void merge_lists() {
+  print_msg("in merge_lists()");
+  for (Booking b : cancellations_list) {
+   System.out.println(b.toString());
+   mal_cancellations_list.add(b);
+  }
+  cancellations_list.clear();
+ }
+
+}%%METHODS
+
+
+ 
+

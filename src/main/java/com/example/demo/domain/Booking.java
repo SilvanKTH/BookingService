@@ -16,21 +16,26 @@ public class Booking {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long Id;
-	//@ManyToOne //Maps one or more bookings to a user
-	//private User user; 
+
 	@NotNull
 	private String name;
+	
 	@Range(min=0, max=4)
 	private Integer rooms;
+	
 	@Range(min=0)
 	private Integer arrival;
+	
 	@Range(min=0)
 	private Integer departure;
+	
 	@Range(min=0)
 	private Integer cancelLatest;
+	
 	private Boolean confirm;
 	private Boolean cancel;
 	private Boolean payment;
+	
 	@Range(min=0)
 	private Integer cancelDate;
 	
@@ -136,7 +141,5 @@ public class Booking {
 				+ departure + ", cancelLatest=" + cancelLatest + ", confirm=" + confirm + ", cancel=" + cancel
 				+ ", payment=" + payment + ", cancelDate=" + cancelDate + "]";
 	}
-
-	
 
 }

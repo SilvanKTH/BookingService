@@ -4,9 +4,9 @@ node [shape = circle]; start;
 node [shape = octagon]; ddos;
 node [shape = point]; _s_s;
 _s_s -> start;
-start -> start [ label = "(1) late_cancellation\\( ( cancel_latest - cancel_date ) <= CRITICAL_PERIOD ) && ( ( cancel_latest - cancel_date ) >= 0 ) && ( late_cancellations < CRITICAL_NO_ATTACKERS ) \\late_cancellations ++ ; print_msg ( late_cancellations + \"  late_cancellations \" ) ; cancellations_list . add ( booking ) ; "];
-start -> ddos [ label = "(2) late_cancellation\\( ( cancel_latest - cancel_date ) <= CRITICAL_PERIOD ) && ( ( cancel_latest - cancel_date ) >= 0 ) \\is_ddos = true ; late_cancellations ++ ; print_msg ( late_cancellations + \"  late_cancellations - critical state reached! \" ) ; merge_lists ( ) ; mal_cancellations_list . add ( booking ) ; "];
-start -> start [ label = "(3) system_reset\\\\print_msg ( \" resetting system from state start (Booking) \" + booking . toString ( ) ) ; "];
-ddos -> ddos [ label = "(1) late_cancellation\\( ( cancel_latest - cancel_date ) <= CRITICAL_PERIOD ) && ( ( cancel_latest - cancel_date ) >= 0 ) \\late_cancellations ++ ; print_msg ( late_cancellations + \"  late_cancellations \" ) ; mal_cancellations_list . add ( booking ) ; "];
-ddos -> start [ label = "(2) system_reset\\\\print_msg ( \" resetting system from state ddos (Booking) \" ) ; "];
+start -> start [ label = "(1) late_cancellation\\( ( cancel_latest - cancel_date ) <= CRITICAL_PERIOD ) && ( ( cancel_latest - cancel_date ) >= 0 ) && ( late_cancellations < CRITICAL_NO_ATTACKERS ) \\late_cancellations ++ ; cancellations_list . add ( booking ) ; "];
+start -> ddos [ label = "(2) late_cancellation\\( ( cancel_latest - cancel_date ) <= CRITICAL_PERIOD ) && ( ( cancel_latest - cancel_date ) >= 0 ) \\is_ddos = true ; late_cancellations ++ ; merge_lists ( ) ; mal_cancellations_list . add ( booking ) ; "];
+start -> start [ label = "(3) system_reset\\\\ "];
+ddos -> ddos [ label = "(1) late_cancellation\\( ( cancel_latest - cancel_date ) <= CRITICAL_PERIOD ) && ( ( cancel_latest - cancel_date ) >= 0 ) \\late_cancellations ++ ; mal_cancellations_list . add ( booking ) ; "];
+ddos -> start [ label = "(2) system_reset\\\\ "];
 }

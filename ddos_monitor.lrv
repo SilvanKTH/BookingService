@@ -64,25 +64,25 @@ GLOBAL {
   TRANSITIONS {
    
    start -> cancel 
-[confirm_cancel() \ \ cancellations++; print_msg(cancellations+" cancellations (start -> cancel)");]
+[confirm_cancel() \ \ cancellations++;]
    
    cancel -> cancel 
-[confirm_cancel() \ \ cancellations++; print_msg(cancellations+" cancellations (cancel -> cancel)");]
+[confirm_cancel() \ \ cancellations++;]
 
    cancel -> ddos 
-[confirm_cancel() \ is_ddos == true \ cancellations++; print_msg(cancellations+" cancellations (cancel -> ddos)");]
+[confirm_cancel() \ is_ddos == true \ cancellations++;]
 
    ddos -> ddos 
-[confirm_cancel() \ \ cancellations++; print_msg(cancellations+" cancellations (ddos -> ddos)");]
+[confirm_cancel() \ \ cancellations++;]
 
    cancel -> start 
-[system_reset() \ \ reset_all_lists(); print_msg("resetting system from state cancel");]
+[system_reset() \ \ reset_all_lists();]
 
    ddos -> start 
-[system_reset() \ \ reset_all_lists(); is_ddos = false; print_msg("resetting system from state ddos");]
+[system_reset() \ \ reset_all_lists(); is_ddos = false;]
 
    start -> start 
-[system_reset() \ \ reset_all_lists(); print_msg("resetting system from state start");]
+[system_reset() \ \ reset_all_lists();]
 
   }%%TRANSITIONS
 
@@ -100,10 +100,10 @@ GLOBAL {
   TRANSITIONS {
    
    start -> start 
-[confirm_booking()\ \ bookings++; print_msg(bookings+" bookings");]
+[confirm_booking()\ \ bookings++;]
 
    start -> undefined 
-[confirm_booking()\ bookings < cancellations \ print_msg("undefined state - less bookings than cancellations"); bookings++;]
+[confirm_booking()\ bookings < cancellations \ bookings++;]
 
   }%%TRANSITIONS
 
@@ -143,17 +143,17 @@ GLOBAL {
    TRANSITIONS {
 
     start -> start 
-[late_cancellation()\ ((cancel_latest - cancel_date) <= CRITICAL_PERIOD) && ((cancel_latest - cancel_date) >= 0) && (late_cancellations < CRITICAL_NO_ATTACKERS) \ late_cancellations++; print_msg(late_cancellations+" late_cancellations"); cancellations_list.add(booking);]
+[late_cancellation()\ ((cancel_latest - cancel_date) <= CRITICAL_PERIOD) && ((cancel_latest - cancel_date) >= 0) && (late_cancellations < CRITICAL_NO_ATTACKERS) \ late_cancellations++; cancellations_list.add(booking);]
     
     start -> ddos 
-[late_cancellation()\ ((cancel_latest - cancel_date) <= CRITICAL_PERIOD) && ((cancel_latest - cancel_date) >= 0) \ is_ddos = true; late_cancellations++; print_msg(late_cancellations+" late_cancellations - critical state reached!"); merge_lists(); mal_cancellations_list.add(booking);]
+[late_cancellation()\ ((cancel_latest - cancel_date) <= CRITICAL_PERIOD) && ((cancel_latest - cancel_date) >= 0) \ is_ddos = true; late_cancellations++;  merge_lists(); mal_cancellations_list.add(booking);]
 
     ddos -> ddos 
-[late_cancellation()\ ((cancel_latest - cancel_date) <= CRITICAL_PERIOD) && ((cancel_latest - cancel_date) >= 0) \ late_cancellations++; print_msg(late_cancellations+" late_cancellations"); mal_cancellations_list.add(booking);]
+[late_cancellation()\ ((cancel_latest - cancel_date) <= CRITICAL_PERIOD) && ((cancel_latest - cancel_date) >= 0) \ late_cancellations++; mal_cancellations_list.add(booking);]
 
-    start -> start [system_reset() \ \ print_msg("resetting system from state start (Booking)"+booking.toString());]
+    start -> start [system_reset() \ \ ]
 
-    ddos -> start [system_reset() \ \ print_msg("resetting system from state ddos (Booking)");] 
+    ddos -> start [system_reset() \ \ ] 
 
    }%%TRANSITIONS
 
@@ -169,7 +169,7 @@ GLOBAL {
 
    TRANSITIONS {
 
-    start -> start [user_payment() \ \ user_pay_list.add(booking); print_msg("Restoring credit for user "+booking.getName());]
+    start -> start [user_payment() \ \ user_pay_list.add(booking);]
 
    }%%TRANSITIONS
 
@@ -187,7 +187,6 @@ METHODS {
 
 %% only needed on system level
  void reset_all_lists() {
-  print_msg("in reset_all_lists()");
   late_cancellations = 0;
 
   if (cancellations_list.size() > 0) { 
@@ -195,7 +194,6 @@ METHODS {
   }
 
   if (mal_cancellations_list.size() > 0) {
-   print_msg("mal_cancellations size: "+mal_cancellations_list.size());
    for (Booking b : mal_cancellations_list) {
     write_mal_cancel.print(b.getName()+"#");
    }
@@ -205,7 +203,6 @@ METHODS {
   write_mal_cancel.flush();
  
   if (user_pay_list.size() > 0) {
-   print_msg("user_pay size: "+ user_pay_list.size());
    for (Booking b : user_pay_list) {
     write_user_pay.print(b.getName()+"#");
    }
@@ -217,7 +214,6 @@ METHODS {
 
 %% only needed on booking level, add 'parent' manually
  void merge_lists() {
-  print_msg("in merge_lists()");
   for (Booking b : cancellations_list) {
    System.out.println(b.toString());
    mal_cancellations_list.add(b);

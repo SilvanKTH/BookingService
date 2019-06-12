@@ -48,7 +48,7 @@ public class InitialConfiguration {
 		
 		for (int i = 0; i < timeUnits; i++) {
 			Long day = Long.valueOf(i);
-			Service s = new Service(day, rooms);
+			Service s = new Service(day, rooms, rooms);
 			serviceRepo.save(s);
 		}
 	}
@@ -165,7 +165,9 @@ public class InitialConfiguration {
 								System.out.println("Malicious user not found "+malUsersArr[i]);
 							} else {
 								User u = users.get(0);
-								u.setTrust(u.getTrust()-1);
+								if (u.getTrust() > 0) {
+									u.setTrust(u.getTrust()-1);
+								}								
 								userRepo.save(u);
 							}
 						}
@@ -187,7 +189,7 @@ public class InitialConfiguration {
 					String benignUsers = temp.get(temp.size()-2);
 					String[] benignUsersArr = benignUsers.split("#");
 					if (benignUsersArr.length > 0) {
-						System.out.println("---- "+benignUsers+" ----");
+						System.out.println("++++ "+benignUsers+" ++++");
 						for (int i = 0; i < benignUsersArr.length; i++) {
 							List<User> users = userRepo.findByName(benignUsersArr[i]);
 							if(users.isEmpty()) {

@@ -14,8 +14,10 @@ public class Creditcard {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
+	
 	@NotNull
 	private String cardNumber;
+	
 	@NotNull
 	private String holder;
 	

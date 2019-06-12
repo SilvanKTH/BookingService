@@ -127,21 +127,21 @@ else if (_state_id_cancellations==1){
 		if (1==0){}
 		else if ((_occurredEvent(_event,0/*confirm_cancel*/))){
 		cancellations ++;
-print_msg (cancellations +" cancellations (cancel -> cancel)");
+/*print_msg (cancellations +" cancellations (cancel -> cancel)");*/
 
 		_state_id_cancellations = 1;//moving to state cancel
 		_goto_cancellations(_info);
 		}
 		else if ((_occurredEvent(_event,0/*confirm_cancel*/)) && (is_ddos ==true )){
 		cancellations ++;
-print_msg (cancellations +" cancellations (cancel -> ddos)");
+/*print_msg (cancellations +" cancellations (cancel -> ddos)");*/
 
 		_state_id_cancellations = 0;//moving to state ddos
 		_goto_cancellations(_info);
 		}
 		else if ((_occurredEvent(_event,4/*system_reset*/))){
 		reset_all_lists ();
-print_msg ("resetting system from state cancel");
+/*print_msg ("resetting system from state cancel");*/
 
 		_state_id_cancellations = 2;//moving to state start
 		_goto_cancellations(_info);
@@ -151,14 +151,14 @@ else if (_state_id_cancellations==2){
 		if (1==0){}
 		else if ((_occurredEvent(_event,0/*confirm_cancel*/))){
 		cancellations ++;
-print_msg (cancellations +" cancellations (start -> cancel)");
+/*print_msg (cancellations +" cancellations (start -> cancel)");*/
 
 		_state_id_cancellations = 1;//moving to state cancel
 		_goto_cancellations(_info);
 		}
 		else if ((_occurredEvent(_event,4/*system_reset*/))){
 		reset_all_lists ();
-print_msg ("resetting system from state start");
+/*print_msg ("resetting system from state start");*/
 
 		_state_id_cancellations = 2;//moving to state start
 		_goto_cancellations(_info);
@@ -168,7 +168,7 @@ else if (_state_id_cancellations==0){
 		if (1==0){}
 		else if ((_occurredEvent(_event,0/*confirm_cancel*/))){
 		cancellations ++;
-print_msg (cancellations +" cancellations (ddos -> ddos)");
+/*print_msg (cancellations +" cancellations (ddos -> ddos)");*/
 
 		_state_id_cancellations = 0;//moving to state ddos
 		_goto_cancellations(_info);
@@ -176,7 +176,7 @@ print_msg (cancellations +" cancellations (ddos -> ddos)");
 		else if ((_occurredEvent(_event,4/*system_reset*/))){
 		reset_all_lists ();
 is_ddos =false ;
-print_msg ("resetting system from state ddos");
+/*print_msg ("resetting system from state ddos");*/
 
 		_state_id_cancellations = 2;//moving to state start
 		_goto_cancellations(_info);
@@ -209,13 +209,13 @@ else if (_state_id_bookings==4){
 		if (1==0){}
 		else if ((_occurredEvent(_event,2/*confirm_booking*/))){
 		bookings ++;
-print_msg (bookings +" bookings");
+/*print_msg (bookings +" bookings");*/
 
 		_state_id_bookings = 4;//moving to state start
 		_goto_bookings(_info);
 		}
 		else if ((_occurredEvent(_event,2/*confirm_booking*/)) && (bookings <cancellations )){
-		print_msg ("undefined state - less bookings than cancellations");
+		/*print_msg ("undefined state - less bookings than cancellations");*/
 bookings ++;
 
 		_state_id_bookings = 3;//moving to state undefined
@@ -251,7 +251,7 @@ System.out.println("LARVA LOG: >>"+msg);
 
 
 void reset_all_lists() {
-print_msg("in reset_all_lists()");
+/*print_msg("in reset_all_lists()");*/
 late_cancellations = 0;
 
 if (cancellations_list.size() > 0) {
@@ -259,7 +259,7 @@ cancellations_list.clear();
 }
 
 if (mal_cancellations_list.size() > 0) {
-print_msg("mal_cancellations size: "+mal_cancellations_list.size());
+/*print_msg("mal_cancellations size: "+mal_cancellations_list.size());*/
 for (Booking b : mal_cancellations_list) {
 write_mal_cancel.print(b.getName()+"#");
 }
@@ -269,7 +269,7 @@ write_mal_cancel.println("\n---");
 write_mal_cancel.flush();
 
 if (user_pay_list.size() > 0) {
-print_msg("user_pay size: "+ user_pay_list.size());
+/*print_msg("user_pay size: "+ user_pay_list.size());*/
 for (Booking b : user_pay_list) {
 write_user_pay.print(b.getName()+"#");
 }
@@ -281,7 +281,7 @@ write_user_pay.flush();
 
 
 void merge_lists() {
-print_msg("in merge_lists()");
+/*print_msg("in merge_lists()");*/
 for (Booking b : cancellations_list) {
 System.out.println(b.toString());
 mal_cancellations_list.add(b);
