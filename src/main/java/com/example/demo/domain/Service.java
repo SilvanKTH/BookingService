@@ -59,12 +59,12 @@ public class Service {
 		this.availableRooms = rooms;
 	}
 
-	public Integer getTotalBookedRooms() {
+	public Integer getTotalAvailableRooms() {
 		return totalAvailableRooms;
 	}
 
-	public void setTotalBookedRooms(Integer totalBookedRooms) {
-		this.totalAvailableRooms = totalBookedRooms;
+	public void setTotalAvailableRooms(Integer totalAvailableRooms) {
+		this.totalAvailableRooms = totalAvailableRooms;
 	}
 
 	@Override

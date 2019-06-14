@@ -1,5 +1,6 @@
 package com.example.demo.configuration;
 
+import org.apache.tomcat.jni.Time;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -12,6 +13,8 @@ import org.springframework.core.task.TaskExecutor;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -24,6 +27,8 @@ import com.example.demo.domain.User;
 import com.example.demo.repository.BookingRepo;
 import com.example.demo.repository.ServiceRepo;
 import com.example.demo.repository.UserRepo;
+
+import com.example.demo.larva.*;
 
 @Configuration
 @EnableAspectJAutoProxy  
@@ -56,10 +61,14 @@ public class InitialConfiguration {
 	@Bean
 	void initUserDBTest() {
 		/*
-		User u1 = new User("a", "1133557799");
-		User u2 = new User("b", "2244668800");
-		userRepo.save(u1);
-		userRepo.save(u2);
+		User malicious = new User("malicious", "6666666666");
+		malicious.setTrust(LocalConstants.TRUSTLEVEL_LOW);
+		User cancel = new User("cancel", "1019239812");
+		cancel.setTrust(LocalConstants.TRUSTLEVEL_MED);
+		User trusted = new User("trusted", "1234567890");		
+		userRepo.save(malicious);
+		userRepo.save(cancel);
+		userRepo.save(trusted);
 		*/
 	}
 	
@@ -131,7 +140,131 @@ public class InitialConfiguration {
 					Long timeElapsed = stop - start;
 					System.out.println("------ time elapsed for operation: "+timeElapsed+"ms -----");
 					Thread.sleep(LocalConstants.DAY_IN_MILLIS - timeElapsed);
+					
+					if ((currentDate % LocalConstants.SIMULATION_DURATION) == 0) {
+						saveStatistics();
+					}
 				}
+			}
+
+			private void saveStatistics() {
+				System.out.println("+++ SAVING STATS +++");
+				String fileName = "/stats-ddos-";
+				String ddosThreshold = "threshold-"+LocalConstants.CRITICAL_NO_ATTACKERS+"-";
+				String period = LocalConstants.SIMULATION_DURATION+"-";
+				String timeStamp = System.currentTimeMillis()+".txt";
+				File file = null;
+				try {
+					file = new File(LocalConstants.statisticsDirectory+fileName+ddosThreshold+period+timeStamp);
+					if (file.createNewFile()) {
+						System.out.println("new file created");
+					} else {
+						System.out.println("writing to existing file");
+					}
+				} catch (IOException ioe) {
+					System.out.println("IOException occured");
+				} 
+				
+				int allDetectedMalUsers = 0;
+				int allMalUsers = 0;
+				int allFalsePositives = 0;
+				int allFalsePositivesZeroTrust = 0;
+				int allBenignUsers = 0;
+				float detectionRate = 0;
+				float falsePositiveRate = 0;
+				float falsePositiveRateZeroTrust = 0;
+				List<Service> items;
+				
+				allDetectedMalUsers = getAllDetectedMalUsers();
+				allMalUsers = getAllMalUsers();
+				
+				try {
+					detectionRate = ((float) allDetectedMalUsers / (float) allMalUsers);
+				} catch (ArithmeticException e) {
+					System.out.println("No malicious users in set, attempted division by zero");
+				}
+				
+				allFalsePositives = getAllFalsePositives();
+				allFalsePositivesZeroTrust = getAllFalsePositivesZeroTrust();
+				allBenignUsers = getAllBenignUsers();
+				
+				try {
+					falsePositiveRate = ((float) allFalsePositives / (float) allBenignUsers);
+					falsePositiveRateZeroTrust = ((float) allFalsePositivesZeroTrust / (float) allBenignUsers);
+				} catch (ArithmeticException e) {
+					System.out.println("No benign users in set, attempted division by zero");
+				}
+								
+				items = serviceRepo.findAll();
+				
+				PrintWriter stats = null;
+				try {
+					stats = new PrintWriter(file);
+					stats.println("### DETECTION RATE IS:       "+detectionRate);
+					stats.println("### NO. DET MALICIOUS USERS: "+allDetectedMalUsers);
+					stats.println("### NO. ALL MALICIOUS USERS: "+allMalUsers);
+					stats.println("### ");
+					stats.println("### FALSE POSITIVE RATE IS:           "+falsePositiveRate);
+					stats.println("### FALSE POSITIVES (WORST CASE)      "+falsePositiveRateZeroTrust);
+					stats.println("### NO. WRONGLY DET USERS             "+allFalsePositives);
+					stats.println("### NO. WRONGLY DET USERS (WORST CASE)"+allFalsePositivesZeroTrust);
+					stats.println("### NO. BENIGN USERS:                 "+allBenignUsers);
+					stats.println("###");
+					stats.println("DAY - AV ROOMS - OCCUPANCY %");
+					
+					for (int i = 1; i <= 60; i++) {
+						Service s = items.get(i);
+						Integer avRooms = s.getRooms();
+						Float occupancyRate = (float) (LocalConstants.NUMBER_ROOMS - avRooms) / (float) LocalConstants.NUMBER_ROOMS;
+						stats.println(i+" - "+avRooms+" - "+occupancyRate);
+					}
+					
+					stats.flush();
+					stats.close();
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
+				
+				
+				// 1) 	Write file with DDOS threshold and date (e.g. stats-ddosX-xxxx)
+				// 2.1) DETECTION RATE: How many users with trustlevel 0 and trustlevel 1 AND name like 'malicious%'?
+				// 2.2) compared to HOW many users with name like 'malicious%' AND trustlevel 2 and cancellations > 0
+				// 3.1) FALSE POSITIVES: How many users where trustreparation > 1 AND name like 'spont%', 'normal%' or 'planned%'
+				// 3.2) HOW many were to lowest trust level (i.e. no service) where lowestrustlevel == 0 AND name like 'spont%', 'normal%' or 'planned%'
+				// 3.3) compared to: How many users where lowesttrustlevel == 2 AND name like 'spont%', 'normal%' or 'planned%'
+				// 4.1) HOW did the IDS impact the occupancy rate?
+				// 4.2) Plot bookings without IDS vs. bookings with IDS 
+				// 5.1)	WHAT was the performance impact of the RV system 
+			}
+
+			private int getAllBenignUsers() {
+				List<User> allBenignUsers;
+				allBenignUsers = userRepo.allBenignUsers();
+				return allBenignUsers.size();
+			}
+			
+			private int getAllMalUsers() {
+				List<User> allMalUsers;
+				allMalUsers = userRepo.allMaliciousUsers();
+				return allMalUsers.size();
+			}
+
+			private int getAllFalsePositivesZeroTrust() {
+				List<User> allFalsePositivesZeroTrust;
+				allFalsePositivesZeroTrust = userRepo.allBenignFalseUntrusted();
+				return allFalsePositivesZeroTrust.size();
+			}
+
+			private int getAllFalsePositives() {
+				List<User> allFalsePositives;
+				allFalsePositives = userRepo.allBenignFalsePositives();
+				return allFalsePositives.size();
+			}
+
+			private int getAllDetectedMalUsers() {
+				List<User> allDetectedMalUsers;
+				allDetectedMalUsers = userRepo.allMaliciousDetected();
+				return allDetectedMalUsers.size();
 			}
 
 			private void updatePayments(WebController controller) {
@@ -167,6 +300,7 @@ public class InitialConfiguration {
 								User u = users.get(0);
 								if (u.getTrust() > 0) {
 									u.setTrust(u.getTrust()-1);
+									u.setLowestTrustLevel(u.getTrust());
 								}								
 								userRepo.save(u);
 							}
@@ -196,7 +330,10 @@ public class InitialConfiguration {
 								System.out.println("Benign user not found "+benignUsersArr[i]);
 							} else {
 								User u = users.get(0);
-								u.setTrust(LocalConstants.TRUSTLEVEL_HIGH);
+								if (u.getTrust() < LocalConstants.TRUSTLEVEL_HIGH) {
+									u.setTrust(LocalConstants.TRUSTLEVEL_HIGH);
+									u.setTrustReparations(u.getTrustReparations() + 1);
+								}								
 								userRepo.save(u);
 							}
 						}

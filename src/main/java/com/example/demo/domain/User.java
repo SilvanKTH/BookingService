@@ -31,12 +31,24 @@ public class User {
 	@NotNull
 	private String creditcard;
 	
+	private Integer bookings;
+	
+	private Integer cancellations;
+	
+	private Integer trustReparations;
+	
+	private Integer lowestTrustLevel;
+	
 	public User () {}
 	
 	public User(String name, String creditcard) {
 		this.name = name.trim();
 		this.creditcard = creditcard;
 		this.trust = LocalConstants.TRUSTLEVEL_HIGH; // Default setting, may be changed 
+		this.bookings = 0;
+		this.cancellations = 0;
+		this.trustReparations = 0;
+		this.lowestTrustLevel = LocalConstants.TRUSTLEVEL_HIGH;
 	}
 	
 	public Long getId() {
@@ -74,9 +86,45 @@ public class User {
 		}	
 	}
 
+	public Integer getBookings() {
+		return bookings;
+	}
+
+	public void setBookings(Integer bookings) {
+		this.bookings = bookings;
+	}
+
+	public Integer getCancellations() {
+		return cancellations;
+	}
+
+	public void setCancellations(Integer cancellations) {
+		this.cancellations = cancellations;
+	}
+
+	public Integer getTrustReparations() {
+		return trustReparations;
+	}
+
+	public void setTrustReparations(Integer trustReparations) {
+		this.trustReparations = trustReparations;
+	}
+
+	public Integer getLowestTrustLevel() {
+		return lowestTrustLevel;
+	}
+
+	public void setLowestTrustLevel(Integer lowestTrustLevel) {
+		this.lowestTrustLevel = lowestTrustLevel;
+	}
+
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", name=" + name + ", trust=" + trust + ", creditcard=" + creditcard + "]";
+		return "User [id=" + id + ", name=" + name + ", trust=" + trust + ", creditcard=" + creditcard + ", bookings="
+				+ bookings + ", cancellations=" + cancellations + ", trustReparations=" + trustReparations
+				+ ", lowestTrustLevel=" + lowestTrustLevel + "]";
 	}
+
+	
 	
 }

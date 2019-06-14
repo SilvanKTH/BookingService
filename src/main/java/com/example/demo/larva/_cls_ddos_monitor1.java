@@ -30,8 +30,8 @@ public static String user;
 public static Booking booking1;
 public Booking booking;
 int no_automata = 2;
- public final int CRITICAL_PERIOD =2 ;
- public final int CRITICAL_NO_ATTACKERS =2 ;
+ public final int CRITICAL_PERIOD = LocalConstants.CRITICAL_PERIOD ;
+ public final int CRITICAL_NO_ATTACKERS = LocalConstants.CRITICAL_NO_ATTACKERS ;
 
 public static void initialize(){}
 //inheritance could not be used because of the automatic call to super()

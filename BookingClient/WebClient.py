@@ -4,6 +4,21 @@ import random
 import time
 import os
 import shutil
+import sys
+
+
+ctr = 0
+mal_ctr = 0
+
+
+def incr_ctr():
+    global ctr
+    ctr = (ctr + 1) % sys.maxsize
+
+
+def incr_mal_ctr():
+    global mal_ctr
+    mal_ctr = (mal_ctr + 1) % sys.maxsize
 
 
 class BookingClient:
@@ -66,17 +81,26 @@ class BookingClient:
 
     def det_cancel_behaviour(self):
         cancels = False
-        rand_no = random.randrange(0, 100)
-        if (self.cancel_likelihood >= rand_no):
+        if (self.user_name.__contains__('malicious')):
             cancels = True
+        else:
+            random.seed(ctr)
+            rand_no = random.randrange(0, 100)
+            incr_ctr()
+            if (self.cancel_likelihood >= rand_no):
+                cancels = True
         return cancels
 
     def det_cancel_date(self):
-        if (self.cancel_likelihood == 100):
+        if (self.user_name.__contains__('malicious')): # only the case when user is malicious
+            random.seed(mal_ctr)
             rand_no = random.randrange(0, 1)
+            incr_mal_ctr()
             self.cancel_date = int(self.cancel_latest) - rand_no
         elif (int(self.cancel_latest) - int(self.booking_date) > 1):
+            random.seed(ctr)
             rand_no = random.randrange(int(self.booking_date) + 1, int(self.cancel_latest))
+            incr_ctr()
             self.cancel_date = rand_no
         else:
             self.cancel_date = int(self.cancel_latest)
@@ -167,18 +191,28 @@ class ClientCreator:
 
         self.min_days_in_advance = 2
         self.min_days_in_advance_normal = 7
-        self.min_days_in_advance_planned = 30
-        self.max_days_in_advance = 60
+        self.min_days_in_advance_planned = 14
+        self.max_days_in_advance = 30
 
         self.benign_cancel_likelihood = 10
         self.malicious_cancel_likelihood = 100
 
+        self.user_appendix_factor = 5
+
     def planned_user_creator(self):
         for x in range (0, self.no_planned_users):
+            random.seed(ctr)
             no_rooms = random.randrange(1, 4)
+            incr_ctr()
+            random.seed(ctr)
             arr_date = random.randrange(self.min_days_in_advance_planned, self.max_days_in_advance)
+            incr_ctr()
+            random.seed(ctr)
             no_nights = random.randrange(1, 7)
-            user_appendix = random.randrange(0, self.no_planned_users * 10)
+            incr_ctr()
+            random.seed(ctr)
+            user_appendix = random.randrange(0, self.no_planned_users * self.user_appendix_factor)
+            incr_ctr()
             user_name = 'planned'+str(user_appendix)
             credit_card = '1234567890'
             cancel_likelihood = self.benign_cancel_likelihood
@@ -187,10 +221,18 @@ class ClientCreator:
 
     def normal_user_creator(self):
         for x in range (0, self.no_normal_users):
+            random.seed(ctr)
             no_rooms = random.randrange(1, 4)
+            incr_ctr()
+            random.seed(ctr)
             arr_date = random.randrange(self.min_days_in_advance_normal, self.min_days_in_advance_planned)
+            incr_ctr()
+            random.seed(ctr)
             no_nights = random.randrange(1, 7)
-            user_appendix = random.randrange(0, self.no_planned_users * 10)
+            incr_ctr()
+            random.seed(ctr)
+            user_appendix = random.randrange(0, self.no_planned_users * self.user_appendix_factor)
+            incr_ctr()
             user_name = 'normal'+str(user_appendix)
             credit_card = '5432112345'
             cancel_likelihood = self.benign_cancel_likelihood
@@ -199,10 +241,18 @@ class ClientCreator:
 
     def spontaneous_user_creator(self):
         for x in range (0, self.no_normal_users):
+            random.seed(ctr)
             no_rooms = random.randrange(1, 4)
+            incr_ctr()
+            random.seed(ctr)
             arr_date = random.randrange(self.min_days_in_advance, self.min_days_in_advance_normal)
+            incr_ctr()
+            random.seed(ctr)
             no_nights = random.randrange(1, 7)
-            user_appendix = random.randrange(0, self.no_planned_users * 10)
+            incr_ctr()
+            random.seed(ctr)
+            user_appendix = random.randrange(0, self.no_planned_users * self.user_appendix_factor)
+            incr_ctr()
             user_name = 'spontaneous'+str(user_appendix)
             credit_card = '3761389317'
             cancel_likelihood = self.benign_cancel_likelihood
@@ -212,9 +262,15 @@ class ClientCreator:
     def malicious_user_creator(self):
         for x in range (0, self.no_malicious_users):
             no_rooms = 4
-            arr_date = random.randrange(self.min_days_in_advance, self.min_days_in_advance_normal)
+            random.seed(mal_ctr)
+            arr_date = random.randrange(self.min_days_in_advance, self.max_days_in_advance)
+            incr_mal_ctr()
+            random.seed(mal_ctr)
             no_nights = random.randrange(1, 7)
-            user_appendix = random.randrange(0, self.no_malicious_users * 10)
+            incr_mal_ctr()
+            random.seed(mal_ctr)
+            user_appendix = random.randrange(0, self.no_malicious_users * self.user_appendix_factor)
+            incr_mal_ctr()
             user_name = 'malicious'+str(user_appendix)
             credit_card = '6666666666'
             cancel_likelihood = self.malicious_cancel_likelihood
@@ -230,29 +286,59 @@ class ClientCreator:
 
 def main():
     start_time = int(round(time.time() * 1000))
-    ctr = 1
-    simulation_period_in_min = 5
+    local_ctr = 1
+    av_users_per_benign_group = 30
+    av_mal_users = 30
+    variance = 15
+    mal_variance = 15
+    simulation_period_in_min = 60
     path = '/Users/silvanzeller/Desktop/TCOMM/Master Thesis/BookingService/BookingClient/MalUsers'
     try:
         os.mkdir(path)
     except Exception as e:
         print(e)
-    creator = ClientCreator(60, 60, 60, 20)
+
+    random.seed(ctr)
+    no_planned = no_normal = no_spontaneous = \
+        random.randrange(av_users_per_benign_group - variance, av_users_per_benign_group + variance)
+    incr_ctr()
+
+    random.seed(mal_ctr)
+    no_malicious = random.randrange(av_mal_users - mal_variance, av_mal_users + mal_variance)
+    incr_mal_ctr()
+    no_malicious = 0 ### UNCOMMENT FOR BENCHMARKING
+
+    print('no of users = '+str((no_planned * 3) + no_malicious))
+
+    creator = ClientCreator(no_planned, no_normal, no_spontaneous, no_malicious)
     creator.run_user_creator()
     stop_time = (int(round(time.time() * 1000)))
     diff_in_sec = (stop_time - start_time) / 1000
     sleep_time = 60 - diff_in_sec
     print(sleep_time)
     time.sleep(sleep_time)
-    while (ctr < simulation_period_in_min + 1):
+    while (local_ctr < simulation_period_in_min + 1):
         start_time = int(round(time.time() * 1000))
-        filename = '/cancel_ids'+str(ctr)
+        filename = '/cancel_ids'+str(local_ctr)
         print('searching for filename: '+filename)
         cancel = CancelClient(path+filename)
         cancel.run_cancel_client()
-        creator = ClientCreator(60, 60, 60, 20)
+
+        random.seed(ctr)
+        no_planned = no_normal = no_spontaneous = \
+            random.randrange(av_users_per_benign_group - variance, av_users_per_benign_group + variance)
+        incr_ctr()
+
+        random.seed(mal_ctr)
+        no_malicious = random.randrange(av_mal_users - mal_variance, av_mal_users + mal_variance)
+        incr_mal_ctr()
+        no_malicious = 0 ### UNCOMMENT FOR BENCHMARKING
+
+        print('no of users = ' + str((no_planned * 3) + no_malicious))
+
+        creator = ClientCreator(no_planned, no_normal, no_spontaneous, no_malicious)
         creator.run_user_creator()
-        ctr = ctr + 1
+        local_ctr = local_ctr + 1
         stop_time = (int(round(time.time() * 1000)))
         diff_in_sec = (stop_time - start_time) / 1000
         sleep_time = 60 - diff_in_sec

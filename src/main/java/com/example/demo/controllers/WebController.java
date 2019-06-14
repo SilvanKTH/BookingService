@@ -81,6 +81,7 @@ public class WebController {
 			} else {
 				User u = users.get(0);
 				cancelLatest = arrival - getCancellationPeriod(u, arrival);
+				
 				if (cancelLatest < getCurrentDate()) {
 					cancelLatest = getCurrentDate();
 				}
@@ -178,6 +179,7 @@ public class WebController {
 			List<User> userList = userRepo.findByName(name);
 			if (userList.size() <= 0) {
 				User u = new User(name, creditcard);
+				userList.add(u);
 				userRepo.save(u);
 			} else {
 				User u = userList.get(0);
@@ -196,6 +198,9 @@ public class WebController {
 			if (availableRooms >= userRooms) {
 				if (handleReservation(userRooms, userArrival, userDeparture)) {
 					latestBooking.setConfirm(true);
+					User u = userList.get(0);
+					u.setBookings(u.getBookings() + 1);
+					userRepo.save(u);
 					bookingRepo.save(latestBooking);
 					message = "Thanks for your booking, "+username+"! Your booking ID is "+latestBooking.getId()+" .";
 				} else {
@@ -240,6 +245,10 @@ public class WebController {
 					if (!b.getCancel()) {
 						b.setCancel(true);
 						returnRooms(b);
+						List<User> userList = userRepo.findByName(name);
+						User u = userList.get(0);
+						u.setCancellations(u.getCancellations() + 1);
+						userRepo.save(u);
 						bookingRepo.save(b);
 						message = "We hope to seeing you again soon!";
 					} else {
@@ -279,7 +288,7 @@ public class WebController {
 				Service s = o.get();
 				Integer items = s.getRooms() + rooms;
 				s.setRooms(items);
-				//s.setTotalBookedRooms(items);
+				//s.setTotalAvailableRooms(items);
 			}			
 		}
 	}
@@ -384,7 +393,7 @@ public class WebController {
 					break; 
 				}
 				s.setRooms(items);
-				s.setTotalBookedRooms(items);
+				s.setTotalAvailableRooms(items);
 				serviceRepo.save(s);
 			} else {
 				success = false; 
@@ -400,8 +409,9 @@ public class WebController {
 			if (o.isPresent()) {
 				Service s = o.get();
 				Integer items = s.getRooms() + rooms;
+				Integer virtualItems = s.getTotalAvailableRooms() + rooms;
 				s.setRooms(items);
-				s.setTotalBookedRooms(items);
+				s.setTotalAvailableRooms(virtualItems);
 				serviceRepo.save(s);
 			} else {
 				break;
