@@ -13,12 +13,12 @@ public interface UserRepo extends JpaRepository<User, Long>{
 	List<User> findByName(String name);
 	
 	@Query(value="from user select * where name like 'malicious%' "
-			+ "and trust < 2", 
+			+ "and lowest_trust_level < 2", 
 			nativeQuery=true)
 	List<User> allMaliciousDetected();
 	
 	@Query(value="from user select * where name like 'malicious%' "
-			+ "and trust = 2 "
+			+ "and lowest_trust_level = 2 "
 			+ "and cancellations > 0", 
 			nativeQuery=true)
 	List<User> allMaliciousNotDetected();
@@ -29,12 +29,12 @@ public interface UserRepo extends JpaRepository<User, Long>{
 	List<User> allMaliciousUsers();
 	
 	@Query(value="from user select * where trust_reparations > 0 "
-			+ "and (name like 'spontaneous%' or name like 'normal%' or name like 'planned%')", 
+			+ "and (name not like 'malicious%')", 
 			nativeQuery=true)
 	List<User> allBenignFalsePositives();
 	
 	@Query(value="from user select * where lowest_trust_level = 0 "
-			+ "and (name like 'spontaneous%' or name like 'normal%' or name like 'planned%')", 
+			+ "and (name not like 'malicious%')", 
 			nativeQuery=true)
 	List<User> allBenignFalseUntrusted();
 	

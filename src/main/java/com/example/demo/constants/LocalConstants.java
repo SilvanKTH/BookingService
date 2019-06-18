@@ -12,7 +12,7 @@ public class LocalConstants {
 	public static final Integer TRUSTLEVEL_LOW = 0;
 	
 	// Regarding the available items
-	public static Integer NUMBER_ROOMS = 200; 
+	public static Integer NUMBER_ROOMS = 200;
 	public static Integer INITIAL_PERIOD = 100;
 	
 	// Regarding User naming
@@ -39,9 +39,8 @@ public class LocalConstants {
 	
 	// Regarding Statistics at the End of the Simulation
 	public static final Integer SIMULATION_DURATION = 60;
-	public static String statisticsDirectory = "/Users/silvanzeller/Desktop/TCOMM/Master Thesis/BookingService/Statistics" + 
-			"";
+	public static String statisticsDirectory = "/Users/silvanzeller/Desktop/TCOMM/Master Thesis/BookingService/Statistics";
 	public static int CRITICAL_PERIOD = 2;
-	//public static int CRITICAL_NO_ATTACKERS = 0;
-	public static int CRITICAL_NO_ATTACKERS = 400; // UNCOMMENT FOR BENCHMARKING
+	public static int CRITICAL_NO_ATTACKERS = 0;
+	//public static int CRITICAL_NO_ATTACKERS = 100; // UNCOMMENT FOR BENCHMARKING WITHOUT IDS
 }

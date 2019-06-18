@@ -116,7 +116,7 @@ public class InitialConfiguration {
 				Long timeNow = System.currentTimeMillis();
 				Thread.sleep(LocalConstants.DAY_IN_MILLIS - (timeNow - timeReference));
 				while(true) {
-                    Long start = System.currentTimeMillis();
+					Long start = System.currentTimeMillis();					                    
 					if (controller.getCurrentDate() > currentDate) {
 						currentDate = updateDateAOP(controller);
 					}
@@ -135,15 +135,13 @@ public class InitialConfiguration {
 					} catch (FileNotFoundException e) {
 						System.out.println("---- File not found to obtain benign users! ----");
 					}
-
+                    if ((currentDate % LocalConstants.SIMULATION_DURATION) == 0) {
+						saveStatistics();
+					}
 					Long stop = System.currentTimeMillis();
 					Long timeElapsed = stop - start;
 					System.out.println("------ time elapsed for operation: "+timeElapsed+"ms -----");
-					Thread.sleep(LocalConstants.DAY_IN_MILLIS - timeElapsed);
-					
-					if ((currentDate % LocalConstants.SIMULATION_DURATION) == 0) {
-						saveStatistics();
-					}
+					Thread.sleep(LocalConstants.DAY_IN_MILLIS - timeElapsed);					
 				}
 			}
 
@@ -212,7 +210,7 @@ public class InitialConfiguration {
 					stats.println("###");
 					stats.println("DAY - AV ROOMS - OCCUPANCY %");
 					
-					for (int i = 1; i <= 60; i++) {
+					for (int i = 1; i <= LocalConstants.SIMULATION_DURATION; i++) {
 						Service s = items.get(i);
 						Integer avRooms = s.getRooms();
 						Float occupancyRate = (float) (LocalConstants.NUMBER_ROOMS - avRooms) / (float) LocalConstants.NUMBER_ROOMS;
@@ -272,7 +270,7 @@ public class InitialConfiguration {
 				List<Booking> dueToday = bookingRepo.findByCancelLatest(date - 1); 
 				if (!dueToday.isEmpty()) {
 					for (Booking b : dueToday) {
-						if (!b.getCancel()){
+						if (!b.getCancel() && b.getConfirm()){
 							b.setPayment(true);
 							bookingRepo.save(b);
 						}

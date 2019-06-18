@@ -72,28 +72,32 @@ public class WebController {
 			Integer departure = Integer.parseInt(request.getParameter("departure")) + arrival;
 			Integer cancelLatest = 0;
 			List<User> users = userRepo.findByName(name);
+			User u;
 			if (users.isEmpty()) {
-				User u = new User(name, LocalConstants.CREDITCARD_PLACEHOLDER);
+				u = new User(name, LocalConstants.CREDITCARD_PLACEHOLDER);
 				cancelLatest = arrival - getCancellationPeriod(u, arrival);
 				if (cancelLatest < getCurrentDate()) {
 					cancelLatest = getCurrentDate();
 				}
 			} else {
-				User u = users.get(0);
+				u = users.get(0);
 				cancelLatest = arrival - getCancellationPeriod(u, arrival);
 				
-				if (cancelLatest < getCurrentDate()) {
-					cancelLatest = getCurrentDate();
+				if (cancelLatest < getCurrentDate() + 1) {
+					cancelLatest = getCurrentDate() + 1;
 				}
 			}
 			if (rooms > 0 && rooms <= 4 && arrival >= getCurrentDate() && departure >= arrival) {
 				Integer availableRooms = getAvailableRooms(rooms, arrival, departure);
-				if (availableRooms >= rooms) {
+				boolean hasActiveBookings = checkCurrentBookings(u.getName());
+				if (availableRooms >= rooms && !hasActiveBookings) {
 					Booking booking = new Booking(name, rooms, arrival, departure, cancelLatest); 
 					bookingRepo.save(booking);
 					message = "The booking is being processed ... ";
-				} else {
+				} else if (availableRooms < rooms){
 					message = "ERROR: Unfortunately, we are already fully booked during this period.";
+				} else {
+					message = "ERROR: You still have bookings pending.";
 				}
 			} else {
 				message = "ERROR: You can only book between 1-4 rooms and enter valid dates.";
@@ -107,6 +111,17 @@ public class WebController {
 		
 		return "Web/contact";
 	}
+	private boolean checkCurrentBookings(String name) {
+		boolean hasCurrentBookings = false;
+		List<Booking> bookings = bookingRepo.findByName(name);
+		for (Booking b : bookings) {
+			if (b.getConfirm() && !b.getCancel() && !b.getPayment()) {
+				hasCurrentBookings = true;
+			}		
+		}		
+		return hasCurrentBookings;
+	}
+
 	// Determines service class 
 	// if TrustLevel == high | unknown --> cancel on short notice possible
 	// if TrustLevel == med --> longer cancellation period
@@ -163,8 +178,7 @@ public class WebController {
 		String name = request.getParameter("name");
 		String creditcard = request.getParameter("creditcard");
 		String username, rooms, arrival, departure, cancelLatest, message;
-		List<Booking> bookingList = bookingRepo.findByName(name);
-			
+		List<Booking> bookingList = bookingRepo.findByName(name);	
 		int length = bookingList.size();
 		if (length <= 0) {
 			username = name;
