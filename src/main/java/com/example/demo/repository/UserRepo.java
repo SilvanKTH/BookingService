@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserRepo extends JpaRepository<User, Long>{
-
+	List<User> findAllOrByName(String name);
 	List<User> findByName(String name);
 	
 	@Query(value="from user select * where name like 'malicious%' "

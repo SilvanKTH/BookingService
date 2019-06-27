@@ -90,6 +90,7 @@ public class WebController {
 			if (rooms > 0 && rooms <= 4 && arrival >= getCurrentDate() && departure >= arrival) {
 				Integer availableRooms = getAvailableRooms(rooms, arrival, departure);
 				boolean hasActiveBookings = checkCurrentBookings(u.getName());
+				hasActiveBookings = false;
 				if (availableRooms >= rooms && !hasActiveBookings) {
 					Booking booking = new Booking(name, rooms, arrival, departure, cancelLatest); 
 					bookingRepo.save(booking);
@@ -123,21 +124,21 @@ public class WebController {
 	}
 
 	// Determines service class 
-	// if TrustLevel == high | unknown --> cancel on short notice possible
-	// if TrustLevel == med --> longer cancellation period
-	// if TrustLevel == low --> prepaid, i.e. payment on the same day
+	// if TrustLevel >= high --> cancel on short notice possible
+	// if TrustLevel == med  --> longer cancellation period
+	// if TrustLevel == low  --> prepaid, i.e. payment on the same day
 	private Integer getCancellationPeriod(User u, Integer arrival) {
 		Integer high = LocalConstants.TRUSTLEVEL_HIGH;
 		Integer med = LocalConstants.TRUSTLEVEL_MED;
 		Integer low = LocalConstants.TRUSTLEVEL_LOW;
-		if (u.getTrust() == high) {
+		if (u.getTrust() >= high) {
 			return 1;
 		} else if (u.getTrust() == med) {
 			return 5;
 		} else if (u.getTrust() == low){
 			return arrival - getCurrentDate();
 		} else {
-			return 1;
+			return arrival - getCurrentDate(); //should not occur
 		}
 	}
 

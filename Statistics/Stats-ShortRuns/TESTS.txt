@@ -1,0 +1,27 @@
+TESTS 
+
+per day, 
+40 x Spontaneous
+40 x Normal
+40 x Planned 
+
+with variance of +/- 20
+
+and 
+40 x Malicious
+
+with variance of +/- 20
+
+Service: 200 Rooms
+Duration: 60 Days
+
+IDS: 	ATTACKERS:	COMMENT: 	DONE:
+-	No		Benchmark	X
+-	Yes		Worst Occupancy X
+0	Yes		Det.Rate 100 %	X	
+2	Yes				X
+4	Yes				X
+6	Yes				X	
+8	Yes				X
+10	Yes				X
+12	Yes             Low False +	X	

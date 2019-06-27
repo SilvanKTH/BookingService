@@ -80,8 +80,8 @@ public class User {
 	}
 	
 	public void setTrust(Integer trust) { // probably no good practise
-		if(trust >= LocalConstants.TRUSTLEVEL_LOW 
-				&& trust <= LocalConstants.TRUSTLEVEL_HIGH) {
+		if(trust >= LocalConstants.TRUSTLEVEL_LOW) {
+				//&& trust <= LocalConstants.TRUSTLEVEL_HIGH) {
 			this.trust = trust;
 		}	
 	}

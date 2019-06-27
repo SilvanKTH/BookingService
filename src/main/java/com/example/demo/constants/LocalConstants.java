@@ -27,7 +27,8 @@ public class LocalConstants {
 			+ "You may cancel your reservation for free until 1 time unit before arrival.";
 	public static String MED_TRUST_MESSAGE = "Thanks for your booking.\n"
 			+ "We are processing your reservation.\n"
-			+ "You may cancel your reservation through dialing our service center until 1 time unit before your arrival.";
+			+ "You may cancel your reservation for free until 5 time units before arrival.\n"
+			+ "Alternatively, you may cancel your reservation through dialing our service center until 1 time unit before your arrival.";
 	public static String LOW_TRUST_MESSAGE = "Thanks for your booking.\n"
 			+ "We are processing your reservation.\n"
 			+ "Please acknowledge that we charge a reservation fee of 20 %.\n"
@@ -38,7 +39,7 @@ public class LocalConstants {
 	public static String benignUsersFile = "/Users/silvanzeller/Desktop/TCOMM/Master Thesis/BookingService/src/main/java/com/example/demo///benign_users.txt";
 	
 	// Regarding Statistics at the End of the Simulation
-	public static final Integer SIMULATION_DURATION = 60;
+	public static final Integer SIMULATION_DURATION = 180;
 	public static String statisticsDirectory = "/Users/silvanzeller/Desktop/TCOMM/Master Thesis/BookingService/Statistics";
 	public static int CRITICAL_PERIOD = 2;
 	public static int CRITICAL_NO_ATTACKERS = 0;

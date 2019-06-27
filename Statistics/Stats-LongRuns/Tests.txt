@@ -1,0 +1,29 @@
+TESTS 
+
+per day, 
+50 x Spontaneous
+50 x Normal
+50 x Planned 
+
+with variance of +/- 10
+
+and 
+50 x Malicious
+
+with variance of +/- 10
+
+Service: 200 Rooms
+Duration:180 Days
+
+IDS: 	ATTACKERS:	COMMENT: 	DONE:
+-	No		Benchmark	X
+-	Yes		Worst Occupancy X
+0	Yes		Det.Rate ~100 %	
+2	Yes				X
+4	Yes				X
+6	Yes				
+8	Yes				X
+10	Yes				
+12	Yes		Low False +	X
+
+COMMENT: The number of different user appendices has been increased by *3 for all benign users

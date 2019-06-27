@@ -331,7 +331,9 @@ public class InitialConfiguration {
 								if (u.getTrust() < LocalConstants.TRUSTLEVEL_HIGH) {
 									u.setTrust(LocalConstants.TRUSTLEVEL_HIGH);
 									u.setTrustReparations(u.getTrustReparations() + 1);
-								}								
+								} else {
+									u.setTrust(u.getTrust() + 1);
+								}				
 								userRepo.save(u);
 							}
 						}

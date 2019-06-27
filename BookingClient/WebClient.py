@@ -98,11 +98,6 @@ class BookingClient:
             incr_mal_ctr()
             rand_no = 0
             self.cancel_date = int(self.cancel_latest) - rand_no
-            if (self.user_name == 'malicious165'):
-                print('cancel_latest: '+str(self.cancel_latest))
-                print('cancel_date: '+str(self.cancel_date))
-                print('booking_date: '+str(self.booking_date))
-                print('booking_id: '+str(self.booking_id))
         elif (int(self.cancel_latest) - int(self.booking_date) > 1):
             random.seed(ctr)
             rand_no = random.randrange(int(self.booking_date) + 1, int(self.cancel_latest))
@@ -217,7 +212,7 @@ class ClientCreator:
             no_nights = random.randrange(1, 7)
             incr_ctr()
             random.seed(ctr)
-            user_appendix = random.randrange(0, self.no_planned_users * self.user_appendix_factor)
+            user_appendix = random.randrange(0, (self.no_planned_users * self.user_appendix_factor *3))
             incr_ctr()
             user_name = 'planned'+str(user_appendix)
             credit_card = '1234567890'
@@ -237,7 +232,7 @@ class ClientCreator:
             no_nights = random.randrange(1, 7)
             incr_ctr()
             random.seed(ctr)
-            user_appendix = random.randrange(0, self.no_planned_users * self.user_appendix_factor)
+            user_appendix = random.randrange(0, (self.no_planned_users * self.user_appendix_factor * 3))
             incr_ctr()
             user_name = 'normal'+str(user_appendix)
             credit_card = '5432112345'
@@ -257,7 +252,7 @@ class ClientCreator:
             no_nights = random.randrange(1, 7)
             incr_ctr()
             random.seed(ctr)
-            user_appendix = random.randrange(0, self.no_planned_users * self.user_appendix_factor)
+            user_appendix = random.randrange(0, (self.no_planned_users * self.user_appendix_factor * 3))
             incr_ctr()
             user_name = 'spontaneous'+str(user_appendix)
             credit_card = '3761389317'
@@ -293,11 +288,11 @@ class ClientCreator:
 def main():
     start_time = int(round(time.time() * 1000))
     local_ctr = 1
-    av_users_per_benign_group = 40
-    av_mal_users = 40
-    variance = 20
-    mal_variance = 20
-    simulation_period_in_min = 60
+    av_users_per_benign_group = 50
+    av_mal_users = 50
+    variance = 10
+    mal_variance = 10
+    simulation_period_in_min = 180
     path = '/Users/silvanzeller/Desktop/TCOMM/Master Thesis/BookingService/BookingClient/MalUsers'
     try:
         os.mkdir(path)
