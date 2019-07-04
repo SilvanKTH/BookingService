@@ -89,8 +89,7 @@ public class WebController {
 			}
 			if (rooms > 0 && rooms <= 4 && arrival >= getCurrentDate() && departure >= arrival) {
 				Integer availableRooms = getAvailableRooms(rooms, arrival, departure);
-				boolean hasActiveBookings = checkCurrentBookings(u.getName());
-				hasActiveBookings = false;
+				boolean hasActiveBookings = false;
 				if (availableRooms >= rooms && !hasActiveBookings) {
 					Booking booking = new Booking(name, rooms, arrival, departure, cancelLatest); 
 					bookingRepo.save(booking);
@@ -112,6 +111,8 @@ public class WebController {
 		
 		return "Web/contact";
 	}
+	
+	/*
 	private boolean checkCurrentBookings(String name) {
 		boolean hasCurrentBookings = false;
 		List<Booking> bookings = bookingRepo.findByName(name);
@@ -122,6 +123,7 @@ public class WebController {
 		}		
 		return hasCurrentBookings;
 	}
+	*/
 
 	// Determines service class 
 	// if TrustLevel >= high --> cancel on short notice possible
@@ -244,6 +246,9 @@ public class WebController {
 	// Handle cancellation input and display cancel confirmation page
 	@RequestMapping(value="/cancel-confirmation", method=RequestMethod.POST)
 	public String cancelConfirmation(HttpServletRequest request, Model model) throws NumberFormatException {
+		Long globalStartTimeNanos = System.nanoTime();
+		Long methodStartTimeNanos = 0L;
+		Long methodStopTimeNanos = 0L;
 		String name, message;
 		Long id;
 		Integer cancelDate;
@@ -258,7 +263,9 @@ public class WebController {
 				b.setCancelDate(cancelDate);
 				if (handleCancellation(b)) {
 					if (!b.getCancel()) {
+						methodStartTimeNanos = System.nanoTime();
 						b.setCancel(true);
+						methodStopTimeNanos = System.nanoTime();
 						returnRooms(b);
 						List<User> userList = userRepo.findByName(name);
 						User u = userList.get(0);
@@ -289,7 +296,12 @@ public class WebController {
 		}		
 		Integer timeUnit = getCurrentDate();
 		model.addAttribute("timeUnit", timeUnit);
-			
+		
+		Long globalStopTimeNanos = System.nanoTime();
+		Long globalTime = globalStopTimeNanos - globalStartTimeNanos;
+		Long methodCallTime = methodStopTimeNanos - methodStartTimeNanos;
+		InitialConfiguration.globalTimes.add(globalTime);
+		InitialConfiguration.methodCallTimes.add(methodCallTime);
 		return "Web/cancel-confirmation";
 	}
 	

@@ -27,7 +27,6 @@ if (!initialized){
 }
 }
 before ( Boolean b) : (call(* *.setCancel(..)) && args(b) && !cflow(adviceexecution()) && !cflow(within(larva.*))  && !(within(larva.*)) && if ((b ==true ))) {
-
 synchronized(_asp_ddos_monitor0.lock){
 
 _cls_ddos_monitor0 _cls_inst = _cls_ddos_monitor0._get_cls_ddos_monitor0_inst();

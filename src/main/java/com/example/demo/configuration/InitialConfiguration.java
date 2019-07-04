@@ -16,6 +16,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
@@ -43,6 +44,12 @@ public class InitialConfiguration {
 	BookingRepo bookingRepo;
 	
 	public static Long timeReference;
+	
+	//FOR BENCHMARKING
+	public static ArrayList<Long> globalTimes = new ArrayList<>();
+	public static ArrayList<Long> methodCallTimes = new ArrayList<>();
+	public static ArrayList<Long> aspectTimes = new ArrayList<>();
+	//FOR BENCHMARKING
 	
 	public InitialConfiguration () {}
 	
@@ -152,9 +159,16 @@ public class InitialConfiguration {
 				String period = LocalConstants.SIMULATION_DURATION+"-";
 				String timeStamp = System.currentTimeMillis()+".txt";
 				File file = null;
+				File statsFile = null;
 				try {
 					file = new File(LocalConstants.statisticsDirectory+fileName+ddosThreshold+period+timeStamp);
 					if (file.createNewFile()) {
+						System.out.println("new file created");
+					} else {
+						System.out.println("writing to existing file");
+					}
+					statsFile = new File(LocalConstants.statisticsDirectory+"/time-stats"+System.currentTimeMillis()+".txt");
+					if (statsFile.createNewFile()) {
 						System.out.println("new file created");
 					} else {
 						System.out.println("writing to existing file");
@@ -196,6 +210,7 @@ public class InitialConfiguration {
 				items = serviceRepo.findAll();
 				
 				PrintWriter stats = null;
+				PrintWriter timeStats = null;
 				try {
 					stats = new PrintWriter(file);
 					stats.println("### DETECTION RATE IS:       "+detectionRate);
@@ -216,9 +231,58 @@ public class InitialConfiguration {
 						Float occupancyRate = (float) (LocalConstants.NUMBER_ROOMS - avRooms) / (float) LocalConstants.NUMBER_ROOMS;
 						stats.println(i+" - "+avRooms+" - "+occupancyRate);
 					}
+									
+					Long minGlobal = findMinValue(globalTimes);
+					Long minMethodCall = findMinValue(methodCallTimes);
+					Long minAspect = findMinValue(aspectTimes);
 					
+					Long maxGlobal = findMaxValue(globalTimes);
+					Long maxMethodCall = findMaxValue(methodCallTimes);
+					Long maxAspect = findMaxValue(aspectTimes);
+					
+					Double avgGlobal = getAvg(globalTimes);
+					Double avgMethodCall = getAvg(methodCallTimes);
+					Double avgAspect = getAvg(aspectTimes);
+					
+					int lenGlobal = globalTimes.size();					
+					int lenMethodCall = methodCallTimes.size();					
+					int lenAspect = aspectTimes.size();
+					
+					stats.println();
+					stats.println("### BENCHMARK FOR Booking.setCancel GLOBAL");
+					stats.println("### AVG GLOBAL:      "+avgGlobal);
+					stats.println("### MIN GLOBAL:      "+minGlobal);
+					stats.println("### MAX GLOBAL:      "+maxGlobal);
+					stats.println("### LEN GLOBAL:      "+lenGlobal);
+					stats.println("### AVG METHOD CALL: "+avgMethodCall);
+					stats.println("### MIN METHOD CALL: "+minMethodCall);
+					stats.println("### MAX METHOD CALL: "+maxMethodCall);
+					stats.println("### LEN METHOD CALL: "+lenMethodCall);
+					stats.println("### AVG ASPECT:      "+avgAspect);
+					stats.println("### MIN ASPECT:      "+minAspect);
+					stats.println("### MAX ASPECT:      "+maxAspect);
+					stats.println("### LEN ASPECT:      "+lenAspect);
+							
 					stats.flush();
 					stats.close();
+					
+					timeStats = new PrintWriter(statsFile);
+					timeStats.println("### GLOBAL TIMES:");
+					for (Long l : globalTimes) {
+						timeStats.println(l);
+					}
+					timeStats.println("### METHOD CALL TIMES:");
+					for (Long l : methodCallTimes) {
+						timeStats.println(l);
+					}
+					timeStats.println("### ASPECT TIMES:");
+					for (Long l : aspectTimes) {
+						timeStats.println(l);
+					}
+					
+					timeStats.flush();
+					timeStats.close();			
+					
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 				}
@@ -233,6 +297,35 @@ public class InitialConfiguration {
 				// 4.1) HOW did the IDS impact the occupancy rate?
 				// 4.2) Plot bookings without IDS vs. bookings with IDS 
 				// 5.1)	WHAT was the performance impact of the RV system 
+			}
+
+			private Long findMaxValue(ArrayList<Long> globalTimes) {
+				long max = globalTimes.get(0);
+				for (Long l : globalTimes) {
+					if (l > max) {
+						max = l;
+					}
+				}
+				return max;
+			}
+
+			private Long findMinValue(ArrayList<Long> globalTimes) {
+				Long min = globalTimes.get(0);
+				for (Long l : globalTimes) {
+					if (l < min) {
+						min = l;
+					}
+				}
+				return min;
+			}
+
+			private Double getAvg(ArrayList<Long> globalTimes) {
+				Long sum = 0L;
+				for (Long l : globalTimes) {
+					sum = sum + l;
+				}
+				Double avg = Double.valueOf(sum) / Double.valueOf(globalTimes.size()); 
+				return avg;
 			}
 
 			private int getAllBenignUsers() {

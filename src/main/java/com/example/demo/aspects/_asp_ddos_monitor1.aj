@@ -42,7 +42,9 @@ _cls_inst._call_all_filtered(thisJoinPoint.getSignature().toString(), 8/*user_pa
 }
 before ( Boolean b,Booking booking1) : (call(* Booking.setCancel(..)) && target(booking1) && args(b) && !cflow(adviceexecution()) && !cflow(within(larva.*))  && !(within(larva.*)) && if ((b ==true ))) {
 
+	Long startTimeAspectNano = System.nanoTime();
 synchronized(_asp_ddos_monitor0.lock){
+	
 Booking booking;
 Integer cancel_latest;
 Integer cancel_date;
@@ -57,6 +59,11 @@ _cls_ddos_monitor1.cancel_latest = cancel_latest;
 _cls_ddos_monitor1.cancel_date = cancel_date;
 _cls_inst._call(thisJoinPoint.getSignature().toString(), 6/*late_cancellation*/);
 _cls_inst._call_all_filtered(thisJoinPoint.getSignature().toString(), 6/*late_cancellation*/);
+	
 }
+	Long stopTimeAspectNano = System.nanoTime();
+	Long aspectTime = stopTimeAspectNano - startTimeAspectNano;
+	InitialConfiguration.aspectTimes.add(aspectTime);
+
 }
 }

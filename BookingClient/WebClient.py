@@ -173,12 +173,13 @@ class CancelClient:
         self.read_ids_from_file()
         if (self.cancel_list.__len__() > 0):
             for booking_id in self.cancel_list:
-                values_cancel_res = {'id': booking_id}
-                cancel_conf_str = self.post_request(self.url_conf_cancel, values_cancel_res)
-                if (cancel_conf_str.__contains__('We hope to seeing you again soon!')):
-                    print('Cancellation with ID ' + booking_id + ' succeeded! ')
-                else:
-                    print('Cancellations with ID ' + booking_id + ' failed')
+                if (booking_id != '' and int(booking_id) > 0):
+                    values_cancel_res = {'id': booking_id}
+                    cancel_conf_str = self.post_request(self.url_conf_cancel, values_cancel_res)
+                    if (cancel_conf_str.__contains__('We hope to seeing you again soon!')):
+                        print('Cancellation with ID ' + booking_id + ' succeeded! ')
+                    else:
+                        print('Cancellations with ID ' + booking_id + ' failed')
         else:
             print('No cancellations in this period!')
 
@@ -303,7 +304,6 @@ def main():
     no_planned = no_normal = no_spontaneous = \
         random.randrange(av_users_per_benign_group - variance, av_users_per_benign_group + variance)
     incr_ctr()
-
     random.seed(mal_ctr)
     no_malicious = random.randrange(av_mal_users - mal_variance, av_mal_users + mal_variance)
     incr_mal_ctr()

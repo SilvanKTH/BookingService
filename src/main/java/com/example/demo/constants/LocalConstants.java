@@ -42,6 +42,6 @@ public class LocalConstants {
 	public static final Integer SIMULATION_DURATION = 180;
 	public static String statisticsDirectory = "/Users/silvanzeller/Desktop/TCOMM/Master Thesis/BookingService/Statistics";
 	public static int CRITICAL_PERIOD = 2;
-	public static int CRITICAL_NO_ATTACKERS = 0;
+	public static int CRITICAL_NO_ATTACKERS = 8;
 	//public static int CRITICAL_NO_ATTACKERS = 100; // UNCOMMENT FOR BENCHMARKING WITHOUT IDS
 }
