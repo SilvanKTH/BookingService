@@ -96,7 +96,7 @@ class BookingClient:
             random.seed(mal_ctr)
             rand_no = random.randrange(0, 1)
             incr_mal_ctr()
-            rand_no = 0
+            rand_no = 0 ## CHANGE HERE
             self.cancel_date = int(self.cancel_latest) - rand_no
         elif (int(self.cancel_latest) - int(self.booking_date) > 1):
             random.seed(ctr)
@@ -265,7 +265,7 @@ class ClientCreator:
         for x in range (0, self.no_malicious_users):
             no_rooms = 4
             random.seed(mal_ctr)
-            arr_date = random.randrange(self.min_days_in_advance, self.max_days_in_advance)
+            arr_date = random.randrange(self.min_days_in_advance + 0, self.max_days_in_advance) ## CHANGE HERE
             incr_mal_ctr()
             random.seed(mal_ctr)
             no_nights = random.randrange(1, 7)
@@ -293,7 +293,7 @@ def main():
     av_mal_users = 50
     variance = 10
     mal_variance = 10
-    simulation_period_in_min = 180
+    simulation_period_in_min = 60
     path = '/Users/silvanzeller/Desktop/TCOMM/Master Thesis/BookingService/BookingClient/MalUsers'
     try:
         os.mkdir(path)

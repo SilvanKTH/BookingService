@@ -39,7 +39,7 @@ public class LocalConstants {
 	public static String benignUsersFile = "/Users/silvanzeller/Desktop/TCOMM/Master Thesis/BookingService/src/main/java/com/example/demo///benign_users.txt";
 	
 	// Regarding Statistics at the End of the Simulation
-	public static final Integer SIMULATION_DURATION = 180;
+	public static final Integer SIMULATION_DURATION = 60;
 	public static String statisticsDirectory = "/Users/silvanzeller/Desktop/TCOMM/Master Thesis/BookingService/Statistics";
 	public static int CRITICAL_PERIOD = 2;
 	public static int CRITICAL_NO_ATTACKERS = 8;
